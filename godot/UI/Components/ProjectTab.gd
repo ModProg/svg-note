@@ -15,7 +15,7 @@ onready var _close_button: IconButton = $HBoxContainer/CloseButton
 
 var is_active := false
 var title: String setget set_title
-var project_id: int
+var project: Project
 
 
 # -------------------------------------------------------------------------------------------------

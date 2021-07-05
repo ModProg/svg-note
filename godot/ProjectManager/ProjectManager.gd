@@ -3,6 +3,9 @@ extends Node
 # -------------------------------------------------------------------------------------------------
 var _open_projects: Array  # Array<Project>
 var _active_project: Project
+var _max_id:=0
+
+var active_project: Project setget _make_project_active,_get_active_project
 
 
 # -------------------------------------------------------------------------------------------------
@@ -11,27 +14,26 @@ func read_project_list() -> void:
 
 
 # -------------------------------------------------------------------------------------------------
-func make_project_active(project: Project) -> void:
-	if ! project.loaded:
-		_load_project(project)
+func _make_project_active(project: Project) -> void:
 	_active_project = project
+#	if ! project.loaded:
+#		_load_project(project)
+#	_active_project = project
 
 
 # -------------------------------------------------------------------------------------------------
-func get_active_project() -> Project:
+func _get_active_project() -> Project:
 	return _active_project
 
 
 # -------------------------------------------------------------------------------------------------
 func remove_project(project: Project) -> void:
-	var index := _open_projects.find(project)
-	if index >= 0:
-		_open_projects.remove(index)
+	_open_projects.erase(project)
 
 	if project == _active_project:
 		_active_project = null
 
-	project.clear()
+#	project.clear()
 
 
 # -------------------------------------------------------------------------------------------------
@@ -50,12 +52,13 @@ func add_project(filepath: String = "") -> Project:
 		if p != null:
 			print_debug("Project already in open project list")
 			return p
-
-	var project := Project.new()
-	project.id = _open_projects.size()
-	project.filepath = filepath
-	project.loaded = project.filepath.empty()  # empty/unsaved/new projects are loaded by definition
-	_open_projects.append(project)
+	var project: Project
+	if filepath.empty():
+		project = Project.new()
+		project.empty()
+	else:
+		project = Serializer.load_project(filepath)
+	_open_projects.append( project)
 	return project
 
 
@@ -75,7 +78,7 @@ func save_all_projects() -> void:
 # -------------------------------------------------------------------------------------------------
 func _load_project(project: Project) -> void:
 	if ! project.loaded:
-		Serializer.load_project(project)
+		Serializer.load_project(project.file_name)
 		project.loaded = true
 	else:
 		print_debug("Trying to load already loaded project")
@@ -83,9 +86,9 @@ func _load_project(project: Project) -> void:
 
 # -------------------------------------------------------------------------------------------------
 func get_open_project_by_filepath(filepath: String) -> Project:
-	for p in _open_projects:
-		if p.filepath == filepath:
-			return p
+	for project in _open_projects:
+		if project.filepath == filepath:
+			return project
 	return null
 
 

@@ -18,7 +18,7 @@ onready var _line2d: Line2D = $Line2D
 var eraser := false
 var color: Color setget set_color, get_color
 var size: int
-var points: Array
+var points: Array # Array<Vector2>
 var pressures: Array
 
 

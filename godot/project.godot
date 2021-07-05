@@ -101,8 +101,8 @@ _global_script_classes=[ {
 }, {
 "base": "Reference",
 "class": "Project",
-"language": "GDScript",
-"path": "res://ProjectManager/Project.gd"
+"language": "NativeScript",
+"path": "res://Lib/svg/svglib.gdns"
 }, {
 "base": "PanelContainer",
 "class": "ProjectTab",
@@ -133,11 +133,6 @@ _global_script_classes=[ {
 "class": "Statusbar",
 "language": "GDScript",
 "path": "res://UI/Statusbar.gd"
-}, {
-"base": "",
-"class": "SvgLib",
-"language": "NativeScript",
-"path": "res://Lib/svg/svglib.gdns"
 }, {
 "base": "PanelContainer",
 "class": "Toolbar",
@@ -175,14 +170,13 @@ _global_script_class_icons={
 "SelectionTool": "",
 "Serializer": "",
 "Statusbar": "",
-"SvgLib": "",
 "Toolbar": "",
 "Types": ""
 }
 
 [application]
 
-config/name="Lorien"
+config/name="SVGNotes"
 run/main_scene="res://Main.tscn"
 boot_splash/image="res://Assets/Textures/boot.png"
 boot_splash/fullsize=false
@@ -196,6 +190,7 @@ Utils="*res://Misc/Utils.gd"
 ProjectManager="*res://ProjectManager/ProjectManager.gd"
 Settings="*res://Misc/Settings.gd"
 ProjectMetadata="*res://ProjectManager/ProjectMetadata.gd"
+rust_panic_hook="*res://Lib/panic_hook.gd"
 
 [debug]
 

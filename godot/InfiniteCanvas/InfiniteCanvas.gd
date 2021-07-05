@@ -123,7 +123,7 @@ func get_camera() -> Camera2D:
 
 # -------------------------------------------------------------------------------------------------
 func get_strokes_in_camera_frustrum() -> Array:
-	# FIXME: this currently returns every stroke. 
+	# FIXME: this currently returns every stroke.
 	return _current_project.strokes
 
 
@@ -203,22 +203,23 @@ func end_stroke() -> void:
 
 			# TODO: not sure if needed here
 			_current_stroke.refresh()
+			_current_project.add_line(_current_stroke.color,_brush_size ,_current_stroke.points)
 
 			# Remove the line temporally from the node tree, so the adding is registered in the undo-redo histrory below
-			_strokes_parent.remove_child(_current_stroke)
+			#_strokes_parent.remove_child(_current_stroke)
 
-			_current_project.undo_redo.create_action("Stroke")
-			_current_project.undo_redo.add_undo_method(self, "undo_last_stroke")
-			_current_project.undo_redo.add_undo_reference(_current_stroke)
-			_current_project.undo_redo.add_do_method(_strokes_parent, "add_child", _current_stroke)
-			_current_project.undo_redo.add_do_property(info, "stroke_count", info.stroke_count + 1)
-			_current_project.undo_redo.add_do_property(
-				info, "point_count", info.point_count + _current_stroke.points.size()
-			)
-			_current_project.undo_redo.add_do_method(
-				_current_project, "add_stroke", _current_stroke
-			)
-			_current_project.undo_redo.commit_action()
+#			_current_project.undo_redo.create_action("Stroke")
+#			_current_project.undo_redo.add_undo_method(self, "undo_last_stroke")
+#			_current_project.undo_redo.add_undo_reference(_current_stroke)
+#			_current_project.undo_redo.add_do_method(_strokes_parent, "add_child", _current_stroke)
+#			_current_project.undo_redo.add_do_property(info, "stroke_count", info.stroke_count + 1)
+#			_current_project.undo_redo.add_do_property(
+#				info, "point_count", info.point_count + _current_stroke.points.size()
+#			)
+#			_current_project.undo_redo.add_do_method(
+#				_current_project, "add_stroke", _current_stroke
+#			)
+#			_current_project.undo_redo.commit_action()
 
 		_current_stroke = null
 
@@ -232,14 +233,15 @@ func use_project(project: Project) -> void:
 	info.stroke_count = 0
 
 	# Apply metdadata
-	ProjectMetadata.apply_from_dict(project.meta_data, self)
+	# ProjectMetadata.apply_from_dict(project.meta_data, self)
 
 	# Add new data
 	_current_project = project
-	for stroke in _current_project.strokes:
-		_strokes_parent.add_child(stroke)
-		info.stroke_count += 1
-		info.point_count += stroke.points.size()
+	project.draw(_strokes_parent);
+#	for stroke in _current_project.strokes:
+#		_strokes_parent.add_child(stroke)
+#		info.stroke_count += 1
+#		info.point_count += stroke.points.size()
 
 	_grid.update()
 
@@ -255,7 +257,7 @@ func undo_last_stroke() -> void:
 
 
 # -------------------------------------------------------------------------------------------------
-func set_brush_size(size: int) -> void:
+func set_brush_size(size: float) -> void:
 	_brush_size = size
 	if _active_tool != null:
 		_active_tool._on_brush_size_changed(_brush_size)
@@ -307,21 +309,23 @@ func _delete_selected_strokes() -> void:
 
 # -------------------------------------------------------------------------------------------------
 func _do_delete_stroke(stroke: BrushStroke) -> void:
-	var index := _current_project.strokes.find(stroke)
-	_current_project.strokes.remove(index)
-	_strokes_parent.remove_child(stroke)
-	info.point_count -= stroke.points.size()
-	info.stroke_count -= 1
+	pass
+#	var index := _current_project.strokes.find(stroke)
+#	_current_project.strokes.remove(index)
+#	_strokes_parent.remove_child(stroke)
+#	info.point_count -= stroke.points.size()
+#	info.stroke_count -= 1
 
 
 # FIXME: this adds strokes at the back and does not preserve stroke order; not sure how to do that except saving before
 # and after versions of the stroke arrays which is a nogo.
 # -------------------------------------------------------------------------------------------------
 func _undo_delete_stroke(stroke: BrushStroke) -> void:
-	_current_project.strokes.append(stroke)
-	_strokes_parent.add_child(stroke)
-	info.point_count += stroke.points.size()
-	info.stroke_count += 1
+	pass
+#	_current_project.strokes.append(stroke)
+#	_strokes_parent.add_child(stroke)
+#	info.point_count += stroke.points.size()
+#	info.stroke_count += 1
 
 
 # -------------------------------------------------------------------------------------------------

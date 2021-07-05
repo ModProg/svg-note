@@ -82,7 +82,7 @@ func _ready():
 	# Apply the sizes from the size_theme
 	if theme && size_theme:
 		Layout.apply_themes(theme, [Layout.scale_theme(size_theme.duplicate())])
-		
+
 #	print(svg.compute_something(2))
 
 
@@ -124,7 +124,7 @@ func _process(delta):
 	_statusbar.set_fps(Engine.get_frames_per_second())
 
 	# Update tab title
-	var active_project: Project = ProjectManager.get_active_project()
+	var active_project: Project = ProjectManager.active_project
 	if active_project != null:
 		_menubar.update_tab_title(active_project)
 
@@ -163,7 +163,7 @@ func _on_files_dropped(files: PoolStringArray, screen: int) -> void:
 
 # -------------------------------------------------------------------------------------------------
 func _make_project_active(project: Project) -> void:
-	ProjectManager.make_project_active(project)
+	ProjectManager.active_project = project
 	_canvas.use_project(project)
 
 	if ! _menubar.has_tab(project):
@@ -172,9 +172,9 @@ func _make_project_active(project: Project) -> void:
 
 	# TODO: find a better way to apply the color to the picker
 	var default_canvas_color = Config.DEFAULT_CANVAS_COLOR.to_html()
-	_background_color_picker.color = Color(
-		project.meta_data.get(ProjectMetadata.CANVAS_COLOR, default_canvas_color)
-	)
+#	_background_color_picker.color = Color(
+#		project.meta_data.get(ProjectMetadata.CANVAS_COLOR, default_canvas_color)
+#	)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -209,7 +209,7 @@ func _create_active_default_project() -> void:
 # -------------------------------------------------------------------------------------------------
 func _save_project(project: Project) -> void:
 	var meta_data = ProjectMetadata.make_dict(_canvas)
-	project.meta_data = meta_data
+	#project.meta_data = meta_data
 	ProjectManager.save_project(project)
 	_menubar.update_tab_title(project)
 
@@ -226,22 +226,19 @@ func _on_project_selected(project_id: int) -> void:
 
 
 # -------------------------------------------------------------------------------------------------
-func _on_project_closed(project_id: int) -> void:
+func _on_project_closed(project: Project) -> void:
 	# Ask the user to save changes
-	var project: Project = ProjectManager.get_project_by_id(project_id)
 	if project.dirty:
-		_unsaved_changes_dialog.project_ids.clear()
-		_unsaved_changes_dialog.project_ids.append(project_id)
+		_unsaved_changes_dialog.projects.clear()
+		_unsaved_changes_dialog.projects.append(project)
 		_unsaved_changes_dialog.popup_centered()
 	else:
-		_close_project(project_id)
+		_close_project(project)
 
 
 # -------------------------------------------------------------------------------------------------
-func _close_project(project_id: int) -> void:
-	var active_project: Project = ProjectManager.get_active_project()
-	var project: Project = ProjectManager.get_project_by_id(project_id)
-	var active_project_closed := active_project.id == project.id
+func _close_project(project: Project) -> void:
+	var active_project_closed := ProjectManager.is_active_project(project)
 
 	# Remove project
 	ProjectManager.remove_project(project)
@@ -286,7 +283,7 @@ func _on_open_project(filepath: String) -> bool:
 		return false
 
 	var project: Project = ProjectManager.get_open_project_by_filepath(filepath)
-	var active_project: Project = ProjectManager.get_active_project()
+	var active_project: Project = ProjectManager.active_project
 
 	# Project already open. Just switch to tab
 	if project != null:
@@ -320,7 +317,7 @@ func _on_save_project_as() -> void:
 
 # -------------------------------------------------------------------------------------------------
 func _on_save_project() -> void:
-	var active_project: Project = ProjectManager.get_active_project()
+	var active_project: Project = ProjectManager.active_project
 	if active_project.filepath.empty():
 		_canvas.disable()
 		_file_dialog.mode = FileDialog.MODE_SAVE_FILE
@@ -340,7 +337,7 @@ func _on_file_dialog_closed() -> void:
 
 # -------------------------------------------------------------------------------------------------
 func _on_file_selected_to_save_project(filepath: String) -> void:
-	var active_project: Project = ProjectManager.get_active_project()
+	var active_project: Project = ProjectManager.active_project
 	active_project.filepath = filepath
 	_save_project(active_project)
 

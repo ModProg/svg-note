@@ -4,6 +4,6 @@
 
 [resource]
 resource_name = "SvgLib"
-class_name = "SvgLib"
+class_name = "Project"
 library = ExtResource( 1 )
-script_class_name = "SvgLib"
+script_class_name = "Project"
