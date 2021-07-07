@@ -1,0 +1,40 @@
+[gd_resource type="Theme" load_steps=5 format=2]
+
+[ext_resource path="res://Assets/Fonts/font_14.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Assets/Fonts/Inter-Regular.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+content_margin_left = 12.0
+content_margin_right = 16.0
+
+[sub_resource type="DynamicFont" id=2]
+font_data = ExtResource( 2 )
+
+[resource]
+default_font = ExtResource( 1 )
+Button/fonts/font = ExtResource( 1 )
+Button/styles/disabled = SubResource( 1 )
+Button/styles/focus = SubResource( 1 )
+Button/styles/hover = SubResource( 1 )
+Button/styles/normal = SubResource( 1 )
+Button/styles/pressed = SubResource( 1 )
+ColorPicker/constants/sv_height = 100
+ColorPicker/constants/sv_width = 100
+"Icon Button/constants/small_icon_size" = 0
+"Icon Button/constants/small_size" = 0
+IconButton/constants/icon_size = 24
+IconButton/constants/size = 48
+IconButton/constants/small_icon_size = 24
+IconButton/constants/small_size = 48
+Label/fonts/font = SubResource( 2 )
+Slider/constants/grabber_size = 20
+Slider/constants/length = 120
+ToolButton/constants/C_subtract_bottom = 1
+ToolButton/constants/C_subtract_left = 0
+ToolButton/constants/C_subtract_right = 2
+ToolButton/constants/C_subtract_top = 1
+ToolButton/constants/size = 48
+ToolButton/constants/subtract_bottom = 1
+ToolButton/constants/subtract_left = 0
+ToolButton/constants/subtract_right = 2
+ToolButton/constants/subtract_top = 1

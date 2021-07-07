@@ -1,0 +1,91 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://UI/Menubar.gd" type="Script" id=2]
+[ext_resource path="res://UI/Components/IconButton.gd" type="Script" id=4]
+[ext_resource path="res://Assets/Fonts/font_14.tres" type="DynamicFont" id=5]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[node name="Menubar" type="PanelContainer"]
+anchor_right = 1.0
+margin_left = 1.25
+margin_top = -1.5
+margin_right = 1.25
+margin_bottom = 60.5
+rect_min_size = Vector2( 0, 38 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Left" type="HBoxContainer" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 1913.0
+margin_bottom = 55.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 4
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSeparator3" type="VSeparator" parent="Left"]
+margin_right = 12.0
+margin_bottom = 48.0
+mouse_filter = 2
+size_flags_horizontal = 4
+custom_styles/separator = SubResource( 1 )
+custom_constants/separation = 12
+
+[node name="MenuButton" type="ToolButton" parent="Left"]
+modulate = Color( 0, 0, 0, 1 )
+margin_left = 16.0
+margin_top = 13.0
+margin_right = 28.0
+margin_bottom = 35.0
+focus_mode = 0
+size_flags_horizontal = 4
+size_flags_vertical = 6
+action_mode = 0
+script = ExtResource( 4 )
+normal_icon_name = "menu"
+
+[node name="VSeparator2" type="VSeparator" parent="Left"]
+margin_left = 32.0
+margin_right = 44.0
+margin_bottom = 48.0
+mouse_filter = 2
+size_flags_horizontal = 4
+custom_styles/separator = SubResource( 2 )
+custom_constants/separation = 12
+
+[node name="Tabs" type="HBoxContainer" parent="Left"]
+margin_left = 48.0
+margin_right = 98.0
+margin_bottom = 48.0
+rect_min_size = Vector2( 50, 38 )
+size_flags_horizontal = 4
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NewFileButton" type="Button" parent="Left"]
+modulate = Color( 0, 0, 0, 1 )
+margin_left = 102.0
+margin_top = 24.0
+margin_right = 114.0
+margin_bottom = 48.0
+focus_mode = 0
+size_flags_horizontal = 4
+size_flags_vertical = 8
+custom_fonts/font = ExtResource( 5 )
+flat = true
+script = ExtResource( 4 )
+normal_icon_name = "add"
+small = true
+
+[connection signal="pressed" from="Left/MenuButton" to="." method="_on_MenuButton_pressed"]
+[connection signal="pressed" from="Left/NewFileButton" to="." method="_on_NewFileButton_pressed"]

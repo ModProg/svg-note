@@ -1,0 +1,231 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://InfiniteCanvas/InfiniteCanvas.tscn" type="PackedScene" id=2]
+[ext_resource path="res://UI/Statusbar.tscn" type="PackedScene" id=3]
+[ext_resource path="res://UI/Menubar.tscn" type="PackedScene" id=4]
+[ext_resource path="res://UI/MainMenu.tscn" type="PackedScene" id=5]
+[ext_resource path="res://UI/Toolbar.tscn" type="PackedScene" id=6]
+[ext_resource path="res://UI/Dialogs/UnsavedChangesDialog.tscn" type="PackedScene" id=7]
+[ext_resource path="res://UI/Themes/theme_dark.tres" type="Theme" id=8]
+[ext_resource path="res://UI/Dialogs/AboutDialog.tscn" type="PackedScene" id=9]
+[ext_resource path="res://UI/Dialogs/SettingsDialog.tscn" type="PackedScene" id=10]
+[ext_resource path="res://UI/Dialogs/ExitDialog.tscn" type="PackedScene" id=11]
+[ext_resource path="res://UI/Themes/size_touch.tres" type="Theme" id=12]
+[ext_resource path="res://UI/Components/PopupMinSize.gd" type="Script" id=13]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.207843, 0.211765, 0.227451, 1 )
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color( 0.207843, 0.211765, 0.227451, 1 )
+
+[node name="Main" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource( 8 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+size_theme = ExtResource( 12 )
+
+[node name="InfiniteCanvas" parent="." instance=ExtResource( 2 )]
+
+[node name="Bars" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+margin_bottom = 110.0
+custom_constants/separation = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Menubar" parent="Bars" instance=ExtResource( 4 )]
+anchor_right = 0.0
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 1920.0
+margin_bottom = 62.0
+_main_menu_path = NodePath("../../MainMenu")
+
+[node name="Toolbar" parent="Bars" instance=ExtResource( 6 )]
+anchor_right = 0.0
+margin_top = 62.0
+margin_right = 1920.0
+margin_bottom = 110.0
+file_dialog_path = NodePath("../../FileDialog")
+brush_color_picker_path = NodePath("../../BrushColorPickerPopup/PanelContainer/ColorPicker")
+background_color_picker_path = NodePath("../../BackgroundColorPickerPopup/PanelContainer/ColorPicker")
+
+[node name="Statusbar" parent="." instance=ExtResource( 3 )]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_top = -24.0
+margin_bottom = 0.0
+rect_scale = Vector2( 1, 1.00112 )
+
+[node name="BrushColorPickerPopup" type="Popup" parent="."]
+visible = true
+script = ExtResource( 13 )
+__meta__ = {
+"_edit_group_": true,
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="PanelContainer" type="PanelContainer" parent="BrushColorPickerPopup"]
+margin_right = 310.0
+margin_bottom = 420.0
+custom_styles/panel = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorPicker" type="ColorPicker" parent="BrushColorPickerPopup/PanelContainer"]
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 306.0
+margin_bottom = 416.0
+edit_alpha = false
+presets_enabled = false
+presets_visible = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BackgroundColorPickerPopup" type="Popup" parent="."]
+visible = true
+script = ExtResource( 13 )
+__meta__ = {
+"_edit_group_": true,
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="PanelContainer" type="PanelContainer" parent="BackgroundColorPickerPopup"]
+margin_right = 310.0
+margin_bottom = 420.0
+custom_styles/panel = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorPicker" type="ColorPicker" parent="BackgroundColorPickerPopup/PanelContainer"]
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 306.0
+margin_bottom = 416.0
+mouse_filter = 0
+edit_alpha = false
+presets_enabled = false
+presets_visible = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MainMenu" parent="." instance=ExtResource( 5 )]
+margin_left = 1.0
+margin_top = 38.0
+margin_right = 151.0
+margin_bottom = 138.0
+file_dialog_path = NodePath("../FileDialog")
+
+[node name="FileDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -385.0
+margin_top = -216.5
+margin_right = 385.0
+margin_bottom = 216.5
+theme = ExtResource( 8 )
+window_title = "Datei speichern"
+access = 2
+filters = PoolStringArray( "*.svg" )
+show_hidden_files = true
+current_dir = "/home/modprog/Dokumente/Development/FOSS/GoDot/Lorien/lorien"
+current_path = "/home/modprog/Dokumente/Development/FOSS/GoDot/Lorien/lorien/"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ExitDialog" parent="." instance=ExtResource( 11 )]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -155.0
+margin_top = -45.0
+margin_right = 155.0
+margin_bottom = 45.0
+
+[node name="ExportDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -385.0
+margin_top = -216.5
+margin_right = 385.0
+margin_bottom = 216.5
+theme = ExtResource( 8 )
+window_title = "Datei speichern"
+access = 2
+show_hidden_files = true
+current_dir = "/home/modprog/Dokumente/Development/FOSS/GoDot/Lorien/lorien"
+current_path = "/home/modprog/Dokumente/Development/FOSS/GoDot/Lorien/lorien/"
+
+[node name="UnsavedChangesDialog" parent="." instance=ExtResource( 7 )]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -155.0
+margin_top = -45.0
+margin_right = 155.0
+margin_bottom = 45.0
+
+[node name="AboutDialog" parent="." instance=ExtResource( 9 )]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -225.0
+margin_top = -92.5
+margin_right = 225.0
+margin_bottom = 92.5
+
+[node name="SettingsDialog" parent="." instance=ExtResource( 10 )]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -250.0
+margin_top = -175.0
+margin_right = 250.0
+margin_bottom = 175.0
+
+[node name="GenericAlertDialog" type="AcceptDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -68.5
+margin_top = -35.0
+margin_right = 68.5
+margin_bottom = 35.0
+theme = ExtResource( 8 )
+window_title = "Warnung!"
+dialog_text = "Generic message. "
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="mouse_entered" from="InfiniteCanvas" to="." method="_on_InfiniteCanvas_mouse_entered"]
+[connection signal="mouse_exited" from="InfiniteCanvas" to="." method="_on_InfiniteCanvas_mouse_exited"]

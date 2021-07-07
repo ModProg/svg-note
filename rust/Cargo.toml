@@ -1,0 +1,12 @@
+[package]
+name = "svgnote"
+version = "0.1.0"
+authors = ["Roland Fredenhagen <dev@modprog.de>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+gdnative = "0.9.3"
+svg_notes = {git = "https://github.com/ModProg/SVGNotesLib"}
