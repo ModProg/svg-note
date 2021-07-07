@@ -37,8 +37,8 @@ func _ready():
 
 
 ## Handles all unhandled inputs emiting the corresponding signals.
+# TODO make this unhandled again
 func _input(event):
-	print_debug(event)
 	# Mouse to gesture.
 	if event is InputEventMouseButton:
 		if event.pressed:
