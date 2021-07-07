@@ -1,4 +1,9 @@
 extends Camera2D
+class_name GestureContolledCamera2D
+
+signal zoom_changed(value)
+signal position_changed(value)
+signal rotation_changed(value)
 
 # Configuration
 export(float) var MAX_ZOOM = 4
@@ -25,6 +30,7 @@ func camera2global(position):
 
 func _move(event):
 	position -= (event.relative*zoom).rotated(rotation)
+	emit_signal("position_changed", position)
 	
 func _zoom(event):
 	var li = event.distance
@@ -45,12 +51,15 @@ func _zoom(event):
 	var from_camera_center_pos = event.position - get_camera_center_offset()
 	position -= (from_camera_center_pos*zd).rotated(rotation)
 	zoom = zf*Vector2.ONE
+	emit_signal("zoom_changed", zf)
 
 func _rotate(event):
 	var fccp = (event.position - get_camera_center_offset()) # from_camera_center_pos = fccp
 	var fccp_op_rot =  -fccp.rotated(event.relative)
 	position -= ((fccp_op_rot + fccp)*zoom).rotated(rotation-event.relative)
 	rotation -= event.relative
+	emit_signal("rotation_changed", rotation)
+	emit_signal("position_changed", position)
 
 func get_camera_center_offset():
 	if anchor_mode == ANCHOR_MODE_FIXED_TOP_LEFT:
@@ -60,3 +69,8 @@ func get_camera_center_offset():
 
 func get_camera_size():
 	return get_viewport().get_visible_rect().size
+
+# -------------------------------------------------------------------------------------------------
+func xform(pos: Vector2) -> Vector2:
+	print(pos,zoom,position,(pos * zoom) + position)
+	return (pos * zoom) + position

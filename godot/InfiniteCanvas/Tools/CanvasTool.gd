@@ -8,7 +8,7 @@ var _cursor: Sprite  # This is a BaseCursor. Can't type it.
 var _canvas: Node  # This is an InfinteCanvas. Can't type it though because of cyclic dependency bugs...
 var enabled := false setget set_enabled, get_enabled
 var performing_stroke := false
-var touch := true
+var touch := false
 var stylus := true
 
 

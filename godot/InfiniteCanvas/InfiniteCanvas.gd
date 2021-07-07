@@ -12,7 +12,7 @@ onready var _selection_tool: SelectionTool = $SelectionTool
 onready var _colorpicker_tool: ColorPickerTool = $ColorPickerTool
 onready var _active_tool: CanvasTool = _brush_tool
 onready var _strokes_parent: Node2D = $Viewport/Strokes
-onready var _camera: Camera2D = $Viewport/Camera2D
+onready var _camera: Camera2D = $Viewport/GCC2D
 onready var _viewport: Viewport = $Viewport
 onready var _grid: InfiniteCanvasGrid = $Viewport/Grid
 
@@ -129,7 +129,7 @@ func get_strokes_in_camera_frustrum() -> Array:
 # -------------------------------------------------------------------------------------------------
 func enable() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	_camera.enable_intput()
+	#_camera.enable_input()
 	_active_tool.enabled = true
 	_is_enabled = true
 
@@ -137,7 +137,7 @@ func enable() -> void:
 # -------------------------------------------------------------------------------------------------
 func disable() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	_camera.disable_intput()
+#	_camera.disable_intput()
 	_active_tool.enabled = false
 	_is_enabled = false
 

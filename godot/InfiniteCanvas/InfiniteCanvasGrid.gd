@@ -47,7 +47,7 @@ func set_canvas_color(c: Color) -> void:
 func _draw() -> void:
 	var size = get_viewport().size * _camera.zoom
 	var zoom = _camera.zoom.x
-	var offset = _camera.offset
+	var offset = _camera.position
 
 	var grid_size = GRID_SIZE
 	if zoom > 50:

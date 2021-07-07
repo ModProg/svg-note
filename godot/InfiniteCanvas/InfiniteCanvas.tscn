@@ -78,7 +78,7 @@ zoom_curve = ExtResource( 14 )
 [node name="Grid" type="Node2D" parent="Viewport"]
 material = SubResource( 2 )
 script = ExtResource( 12 )
-camera_path = NodePath("../Camera2D")
+camera_path = NodePath("../GCC2D")
 
 [node name="BrushCursor" parent="Viewport" instance=ExtResource( 4 )]
 

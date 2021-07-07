@@ -54,6 +54,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Control.gd"
 }, {
+"base": "Camera2D",
+"class": "GestureContolledCamera2D",
+"language": "GDScript",
+"path": "res://Lib/GestureControlledCamera2D/GCC2D.gd"
+}, {
 "base": "Reference",
 "class": "I18nParser",
 "language": "GDScript",
@@ -179,6 +184,7 @@ _global_script_class_icons={
 "ColorPickerTool": "",
 "Config": "",
 "ExtendBaseButton": "",
+"GestureContolledCamera2D": "",
 "I18nParser": "",
 "IconButton": "res://Assets/Icons/Editor/icon_button.svg",
 "InfiniteCanvas": "",
