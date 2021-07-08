@@ -46,17 +46,21 @@ impl Shape2D {
                 {
                     let l = line.points.len();
                     line.points[l - 1] = new;
-                    godot_dbg!("hiA");
                 } else if line.points.len() == 0
                     || line.points[line.points.len() - 1].distance_to(new) > MINDIST_NEW_POINT
                 {
                     line.points.push(new);
                 } else {
-                    godot_dbg!(line.points[line.points.len() - 1].distance_to(new), "hiB");
                 }
             }
         }
         self.generate()
+    }
+
+    fn svg_elem(&self) -> Element {
+        match self {
+            Shape2D::Line(line, _) => Element::Line(line.clone(), 0),
+        }
     }
 }
 
@@ -142,11 +146,10 @@ impl Project {
 
     #[export]
     fn _to_string(&self, _owner: &Reference) -> String {
-        todo!()
-        // self.document
-        //     .as_ref()
-        //     .map(Document::to_string)
-        //     .unwrap_or("".to_string())
+        Document {
+            elements: self.shapes.iter().map(Shape2D::svg_elem).collect(),
+        }
+        .to_string()
     }
 
     #[export]

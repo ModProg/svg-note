@@ -72,5 +72,4 @@ func get_camera_size():
 
 # -------------------------------------------------------------------------------------------------
 func xform(pos: Vector2) -> Vector2:
-	print(pos,zoom,position,(pos * zoom) + position)
 	return (pos * zoom) + position

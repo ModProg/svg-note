@@ -83,8 +83,6 @@ func _ready():
 	if theme && size_theme:
 		Layout.apply_themes(theme, [Layout.scale_theme(size_theme.duplicate())])
 
-#	print(svg.compute_something(2))
-
 
 # -------------------------------------------------------------------------------------------------
 func _notification(what):
