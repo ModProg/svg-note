@@ -24,7 +24,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://BrushStroke/BrushStrokeOptimizer.gd"
 }, {
-"base": "CanvasTool",
+"base": "DrawTool",
 "class": "BrushTool",
 "language": "GDScript",
 "path": "res://InfiniteCanvas/Tools/BrushTool.gd"
@@ -48,6 +48,16 @@ _global_script_classes=[ {
 "class": "Config",
 "language": "GDScript",
 "path": "res://Misc/Config.gd"
+}, {
+"base": "CanvasTool",
+"class": "DrawTool",
+"language": "GDScript",
+"path": "res://InfiniteCanvas/Tools/DrawTool.gd"
+}, {
+"base": "CanvasTool",
+"class": "EraserTool",
+"language": "GDScript",
+"path": "res://InfiniteCanvas/Tools/EraseTool.gd"
 }, {
 "base": "BaseButton",
 "class": "ExtendBaseButton",
@@ -114,7 +124,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://UI/Themes/Layout.gd"
 }, {
-"base": "CanvasTool",
+"base": "DrawTool",
 "class": "LineTool",
 "language": "GDScript",
 "path": "res://InfiniteCanvas/Tools/LineTool.gd"
@@ -183,6 +193,8 @@ _global_script_class_icons={
 "ColorPickerCursor": "",
 "ColorPickerTool": "",
 "Config": "",
+"DrawTool": "",
+"EraserTool": "",
 "ExtendBaseButton": "",
 "GestureContolledCamera2D": "",
 "I18nParser": "",
@@ -226,8 +238,8 @@ Utils="*res://Misc/Utils.gd"
 ProjectManager="*res://ProjectManager/ProjectManager.gd"
 Settings="*res://Misc/Settings.gd"
 ProjectMetadata="*res://ProjectManager/ProjectMetadata.gd"
-rust_panic_hook="*res://Lib/panic_hook.gd"
 InputManager="*res://Lib/GDTIM-v1_1_0/InputManager.gd"
+rust_panic_hook="*res://Native/panic_hook.gd"
 
 [debug]
 

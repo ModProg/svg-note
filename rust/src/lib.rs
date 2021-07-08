@@ -62,6 +62,30 @@ impl Shape2D {
             Shape2D::Line(line, _) => Element::Line(line.clone(), 0),
         }
     }
+
+    fn is_at(&self, position: Vector2, width: f32) -> bool {
+        match self {
+            Shape2D::Line(Line { points, .. }, _) => points.iter().any(|p| {
+                position.distance_to(Vector2 {
+                    x: p.0,
+                    y: p.1,
+                    _unit: position._unit,
+                }) < p.2 + width
+            }),
+        }
+    }
+
+    fn erase(&self) {
+        match self {
+            Shape2D::Line(_, line2d) => unsafe { line2d.assume_safe() }.hide(),
+        }
+    }
+
+    fn erased(&self) -> bool {
+        match self {
+            Shape2D::Line(_, line2d) => !unsafe { line2d.assume_safe() }.is_visible(),
+        }
+    }
 }
 
 fn color_g2s(color: core_types::Color) -> colors::Color {
@@ -147,7 +171,11 @@ impl Project {
     #[export]
     fn _to_string(&self, _owner: &Reference) -> String {
         Document {
-            elements: self.shapes.iter().map(Shape2D::svg_elem).collect(),
+            elements: self
+                .shapes
+                .iter()
+                .filter_map(|v| if v.erased() { None } else { Some(v.svg_elem()) })
+                .collect(),
         }
         .to_string()
     }
@@ -169,26 +197,6 @@ impl Project {
     }
 
     #[export]
-    fn end_line(&mut self, _owner: &Reference) -> bool {
-        true
-        // todo!()
-        // if let Some(document) = &mut self.document {
-        //     if self.current_line.is_some() {
-        //         let line = replace(&mut self.current_line, None).unwrap();
-        //         document.elements.push(Element::Line(line, {
-        //             self.current_id += 1;
-        //             self.current_id
-        //         }));
-        //         true
-        //     } else {
-        //         false
-        //     }
-        // } else {
-        //     false
-        // }
-    }
-
-    #[export]
     fn draw_to(&mut self, _owner: &Reference, position: Vector2, width: f32) -> bool {
         if let Some(shape) = self.shapes.last_mut() {
             shape.draw_to(position, width);
@@ -199,8 +207,10 @@ impl Project {
     }
 
     #[export]
-    fn erase_line(&mut self, _owner: &Reference, position: Vector2, width: f32) -> Vec<i32> {
-        todo!()
+    fn erase_line(&mut self, _owner: &Reference, position: Vector2, width: f32) {
+        self.shapes
+            .drain_filter(|e| e.is_at(position, width))
+            .for_each(|e| e.erase());
         // if let Some(document) = &mut self.document {
         //     document
         //         .elements

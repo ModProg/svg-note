@@ -7,6 +7,7 @@ const ERASER_SIZE_FACTOR = 3.5
 
 # -------------------------------------------------------------------------------------------------
 onready var _brush_tool: BrushTool = $BrushTool
+onready var _eraser_tool: EraserTool = $EraserTool
 onready var _line_tool: LineTool = $LineTool
 onready var _selection_tool: SelectionTool = $SelectionTool
 onready var _colorpicker_tool: ColorPickerTool = $ColorPickerTool
@@ -22,6 +23,7 @@ var _background_color: Color
 var _brush_color := Config.DEFAULT_BRUSH_COLOR
 var _brush_size := Config.DEFAULT_BRUSH_SIZE setget set_brush_size
 var _current_project: Project
+var project: Project setget use_project, get_project
 var _use_optimizer := true
 var _optimizer: BrushStrokeOptimizer
 
@@ -75,8 +77,7 @@ func use_tool(tool_type: int) -> void:
 			_active_tool = _brush_tool
 			_use_optimizer = true
 		Types.Tool.ERASER:
-			_brush_tool.mode = BrushTool.Mode.ERASE
-			_active_tool = _brush_tool
+			_active_tool = _eraser_tool
 			_use_optimizer = true
 		Types.Tool.LINE:
 			_active_tool = _line_tool
@@ -159,7 +160,7 @@ func add_stroke_point(point: Vector2, pressure: float = 1.0) -> void:
 
 # -------------------------------------------------------------------------------------------------
 func end_stroke() -> void:
-	_current_project.end_line()
+	pass
 #	if _current_stroke != null:
 #		var points: Array = _current_stroke.points
 #		if (
@@ -226,6 +227,8 @@ func use_project(project: Project) -> void:
 
 	_grid.update()
 
+func get_project() -> Project:
+	return _current_project
 
 # -------------------------------------------------------------------------------------------------
 func undo_last_stroke() -> void:

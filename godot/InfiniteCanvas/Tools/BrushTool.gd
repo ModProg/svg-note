@@ -1,13 +1,12 @@
 class_name BrushTool
-extends CanvasTool
+extends DrawTool
 
 # -------------------------------------------------------------------------------------------------
 enum Mode { DRAW, ERASE }
 
 # -------------------------------------------------------------------------------------------------
-export var pressure_curve: Curve
+
 var mode: int = Mode.DRAW
-var _last_mouse_motion: InputEventMouseMotion
 
 
 # -------------------------------------------------------------------------------------------------
