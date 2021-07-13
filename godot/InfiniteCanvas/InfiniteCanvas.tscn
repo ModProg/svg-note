@@ -24,15 +24,15 @@ _data = [ Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
 shader = ExtResource( 10 )
 shader_param/background_color = null
 
-[sub_resource type="ShaderMaterial" id=4]
+[sub_resource type="ShaderMaterial" id=3]
 shader = ExtResource( 15 )
 shader_param/canvas_color = null
 
 [node name="InfiniteCanvas" type="ViewportContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -1.33484
-margin_right = -1.33484
+margin_left = -0.805177
+margin_right = -0.805176
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -85,10 +85,10 @@ zoom_curve = ExtResource( 14 )
 
 [node name="MeshInstance2D" type="Polygon2D" parent="Viewport/Strokes"]
 color = Color( 1, 1, 1, 0.635294 )
-polygon = PoolVector2Array( 684.386, 262.165, 853.307, 566.842, 1706.87, 489.087, 1626.9, 283.36, 1369.16, 115.332, 502.848, 55.2643 )
+polygon = PoolVector2Array( 1441.7, 214.676, 1594.27, 164.881, 1624.46, 330.157, 1417.34, 290.957, 1406.21, 188.189 )
 
 [node name="Grid" type="Node2D" parent="Viewport"]
-material = SubResource( 4 )
+material = SubResource( 3 )
 script = ExtResource( 12 )
 camera_path = NodePath("../GCC2D")
 

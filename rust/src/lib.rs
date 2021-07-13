@@ -2,18 +2,14 @@
 use std::str::FromStr;
 
 use gdnative::api::line_2d::{LineCapMode, LineJointMode};
-use gdnative::api::{Line2D, Polygon2D};
+use gdnative::api::{Geometry, Line2D, Polygon2D};
 use gdnative::prelude::*;
 use svg_notes::elements::{Element, Line, LinePoint, Polyline, PolylinePoint};
 use svg_notes::{colors, Document};
 
 enum Shape2D {
     Line(Line, Ref<Line2D, Shared>),
-    Polyline(
-        Polyline,
-        Ref<Line2D, Shared>,
-        Option<Ref<Polygon2D, Shared>>,
-    ),
+    Polyline(Polyline, Ref<Line2D, Shared>, Vec<Ref<Polygon2D, Shared>>),
 }
 
 const MINDIST_INLINE: f32 = 2.0;
@@ -25,14 +21,11 @@ impl Shape2D {
             Shape2D::Line(_, child) => node.add_child(child, false),
             Shape2D::Polyline(_, line, polygon) => {
                 node.add_child(line, false);
-                if let Some(polygon) = polygon {
-                    node.add_child(polygon, false);
-                }
             }
         }
     }
 
-    fn generate(&self) {
+    fn generate(&mut self) {
         match self {
             Shape2D::Line(line, node) => {
                 let node = unsafe { node.assume_safe() };
@@ -43,18 +36,46 @@ impl Shape2D {
                     // .skip(node.points().len() as usize)
                     .for_each(|&LinePoint(x, y, _)| node.add_point(Vector2::new(x, y), -1))
             }
-            Shape2D::Polyline(line, stroke, polygon) => {
+            Shape2D::Polyline(line, stroke, polygon2ds) => {
                 let node = unsafe { stroke.assume_safe() };
-                let polygon = polygon.map(|polygon| unsafe { polygon.assume_safe() });
                 node.clear_points();
-                if let Some(polygon) = polygon {
-                    polygon.set_polygon(
-                        line.points
-                            .iter()
-                            .map(|&PolylinePoint(x, y)| Vector2::new(x, y))
-                            .collect(),
-                    )
+                if line.fill.a > 0 {
+                    // let polygon2ds = polygon2ds
+                    //     .iter()
+                    //     .map(|polygon| unsafe { polygon.assume_safe() });
+                    let polygons: Vec<_> = Geometry::godot_singleton()
+                        .merge_polygons_2d(
+                            line.points
+                                .iter()
+                                .map(|&PolylinePoint(x, y)| Vector2::new(x, y))
+                                .collect(),
+                            Vector2Array::new(),
+                        )
+                        .iter()
+                        .map(|v| v.to_vector2_array())
+                        .collect();
+                    for i in 0..polygons.len() {
+                        if i >= polygon2ds.len() {
+                            godot_print!("Adding new polygon for i={}", i);
+                            let fill = Polygon2D::new();
+                            fill.set_antialiased(true);
+                            fill.set_color(color_s2g(line.fill));
+                            fill.set_polygon(polygons[i].clone());
+                            let fill = fill.into_shared();
+                            node.add_child(fill, false);
+                            polygon2ds.push(fill);
+                        } else {
+                            unsafe { polygon2ds.get_unchecked(i).assume_safe() }
+                                .set_polygon(polygons[i].clone())
+                        };
+                    }
+                    polygon2ds
+                        .iter()
+                        .skip(polygons.len())
+                        .map(|p| unsafe { p.assume_safe() })
+                        .for_each(|p| p.set_polygon(Vector2Array::new()))
                 }
+
                 line.points
                     .iter()
                     // .iter().zip(node.points().read().iter())
@@ -125,15 +146,8 @@ impl Shape2D {
     fn erase(&self) {
         match self {
             Shape2D::Line(_, line2d) => unsafe { line2d.assume_safe() }.hide(),
-            Shape2D::Polyline(_, stroke, fill) => {
+            Shape2D::Polyline(_, stroke, _) => {
                 unsafe { stroke.assume_safe() }.hide();
-                if let Some(fill) = fill.map(|fill| unsafe {
-                    {
-                        fill.assume_safe()
-                    }
-                }) {
-                    fill.hide()
-                }
             }
         }
     }
@@ -175,15 +189,7 @@ impl From<Polyline> for Shape2D {
         stroke.set_begin_cap_mode(LineCapMode::ROUND.into());
         stroke.set_joint_mode(LineJointMode::ROUND.into());
         stroke.set_default_color(color_s2g(line.stroke));
-        let fill = if line.fill.a > 0 {
-            let fill = Polygon2D::new();
-            fill.set_antialiased(true);
-            fill.set_color(color_s2g(line.fill));
-            Some(fill)
-        } else {
-            None
-        };
-        Shape2D::Polyline(line, stroke.into_shared(), fill.map(Ref::into_shared))
+        Shape2D::Polyline(line, stroke.into_shared(), vec![])
     }
 }
 
@@ -237,7 +243,7 @@ impl Project {
         } else {
             if let Some(Document { elements }) = Document::from_str(&string).ok() {
                 self.shapes = elements.into_iter().map(Shape2D::from).collect();
-                self.shapes.iter().for_each(|s| {
+                self.shapes.iter_mut().for_each(|s| {
                     s.generate();
                 });
                 true
