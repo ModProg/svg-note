@@ -1,17 +1,14 @@
 class_name InfiniteCanvasGrid
 extends Node2D
 
-# -------------------------------------------------------------------------------------------------
 const GRID_SIZE := 25.0
 const COLOR := Color.red
 
-# -------------------------------------------------------------------------------------------------
 export var camera_path: NodePath
 var _enabled: bool
 var _camera: Camera2D
 
 
-# -------------------------------------------------------------------------------------------------
 func _ready():
 	_camera = get_node(camera_path)
 	_camera.connect("zoom_changed", self, "_on_zoom_changed")
@@ -19,13 +16,11 @@ func _ready():
 	get_viewport().connect("size_changed", self, "_on_viewport_size_changed")
 
 
-# -------------------------------------------------------------------------------------------------
 func enable(e: bool) -> void:
 	set_process(e)
 	visible = e
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_zoom_changed(zoom: float) -> void:
 	update()
 
@@ -38,12 +33,10 @@ func _on_viewport_size_changed() -> void:
 	update()
 
 
-# -------------------------------------------------------------------------------------------------
 func set_canvas_color(c: Color) -> void:
 	material.set_shader_param("canvas_color", c)
 
 
-# -------------------------------------------------------------------------------------------------
 func _draw() -> void:
 	var size = get_viewport().size * _camera.zoom
 	var zoom = _camera.zoom.x

@@ -1,13 +1,11 @@
 extends Node
 
-# -------------------------------------------------------------------------------------------------
 const CAMERA_ZOOM := "camera_zoom"
 const CAMERA_OFFSET_X := "camera_offset_x"
 const CAMERA_OFFSET_Y := "camera_offset_y"
 const CANVAS_COLOR := "canvas_color"
 
 
-# -------------------------------------------------------------------------------------------------
 func make_dict(canvas: InfiniteCanvas) -> Dictionary:
 	var cam: Camera2D = canvas.get_camera()
 
@@ -19,7 +17,6 @@ func make_dict(canvas: InfiniteCanvas) -> Dictionary:
 	}
 
 
-# -------------------------------------------------------------------------------------------------
 func apply_from_dict(meta_data: Dictionary, canvas: InfiniteCanvas) -> void:
 	var cam: Camera2D = canvas.get_camera()
 
@@ -35,7 +32,6 @@ func apply_from_dict(meta_data: Dictionary, canvas: InfiniteCanvas) -> void:
 	canvas.set_background_color(Color(new_canvas_color))
 
 
-# -------------------------------------------------------------------------------------------------
 func get_canvas_color_from_dict(meta_data: Dictionary) -> Color:
 	if meta_data.has(CANVAS_COLOR):
 		return Color(meta_data[CANVAS_COLOR])

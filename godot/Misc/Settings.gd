@@ -9,13 +9,11 @@ const GENERAL_LANGUAGE := "general_language"
 const APPEARANCE_THEME := "appearance_theme"
 const RENDERING_AA_MODE := "rendering_aa_mode"
 
-# -------------------------------------------------------------------------------------------------
 var _config_file := ConfigFile.new()
 var locales: PoolStringArray
 var language_names: PoolStringArray
 
 
-# -------------------------------------------------------------------------------------------------
 func _ready():
 	_config_file = ConfigFile.new()
 	_load_settings()
@@ -27,7 +25,6 @@ func _ready():
 	language_names = parse_result.language_names
 
 
-# -------------------------------------------------------------------------------------------------
 func _load_settings() -> int:
 	var err = _config_file.load(Config.CONFIG_PATH)
 	if err == ERR_FILE_NOT_FOUND:
@@ -38,7 +35,6 @@ func _load_settings() -> int:
 	return err
 
 
-# -------------------------------------------------------------------------------------------------
 func _save_settings() -> int:
 	var err = _config_file.save(Config.CONFIG_PATH)
 	if err == ERR_FILE_NOT_FOUND:
@@ -49,12 +45,10 @@ func _save_settings() -> int:
 	return err
 
 
-# -------------------------------------------------------------------------------------------------
 func get_value(key: String, default_value = null):
 	return _config_file.get_value(DEFAULT_SECTION, key, default_value)
 
 
-# -------------------------------------------------------------------------------------------------
 func set_value(key: String, value = null):
 	_config_file.set_value(DEFAULT_SECTION, key, value)
 	_save_settings()

@@ -1,7 +1,6 @@
 extends PopupMenu
 class_name MainMenu
 
-# -------------------------------------------------------------------------------------------------
 signal open_about_dialog
 signal open_settings_dialog
 signal open_url(url)
@@ -10,7 +9,6 @@ signal open_project(filepath)
 signal save_project
 signal save_project_as
 
-# -------------------------------------------------------------------------------------------------
 const ITEM_OPEN := 0
 const ITEM_SAVE := 1
 const ITEM_SAVE_AS := 2
@@ -25,13 +23,11 @@ const ITEM_VIEW_3 := 102
 
 const ITEM_EXPORT_PNG := 200
 
-# -------------------------------------------------------------------------------------------------
 export var file_dialog_path: NodePath
 onready var _submenu_views: PopupMenu = $ViewsMenu
 onready var _submenu_export: PopupMenu = $ExportMenu
 
 
-# -------------------------------------------------------------------------------------------------
 func _ready():
 	# Views submenu
 	_submenu_views.name = "Views"
@@ -55,7 +51,6 @@ func _ready():
 	add_item(tr("MENU_ABOUT"), ITEM_ABOUT)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_MainMenu_id_pressed(id: int):
 	match id:
 		ITEM_OPEN:
@@ -77,7 +72,6 @@ func _on_MainMenu_id_pressed(id: int):
 			emit_signal("open_about_dialog")
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_open_project():
 	var file_dialog: FileDialog = get_node(file_dialog_path)
 	file_dialog.mode = FileDialog.MODE_OPEN_FILE
@@ -87,26 +81,22 @@ func _on_open_project():
 	file_dialog.popup_centered()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_project_selected_to_open(filepath: String) -> void:
 	emit_signal("open_project", filepath)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_file_dialog_closed() -> void:
 	var file_dialog: FileDialog = get_node(file_dialog_path)
 	Utils.remove_signal_connections(file_dialog, "file_selected")
 	Utils.remove_signal_connections(file_dialog, "popup_hide")
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_SaveAsMenu_id_pressed(id: int):
 	match id:
 		ITEM_EXPORT_PNG:
 			emit_signal("export_as", Types.ExportType.PNG)
 
 
-# -------------------------------------------------------------------------------------------------
 func add_item_with_shortcut(target: PopupMenu, name: String, id: int, shortcut_action: String) -> void:
 	var shortcut = InputMap.get_action_list(shortcut_action)[0].get_scancode_with_modifiers()
 	target.add_item(name, id, shortcut)

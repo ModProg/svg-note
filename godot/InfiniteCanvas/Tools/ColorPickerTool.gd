@@ -5,13 +5,11 @@ var _toolbar: Toolbar
 var _viewport: Viewport
 
 
-# -------------------------------------------------------------------------------------------------
 func _ready():
 	_toolbar = get_tree().root.find_node("Toolbar", true, false)
 	_viewport = get_node("../Viewport")
 
 
-# -------------------------------------------------------------------------------------------------
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_cursor.global_position = xform_vector2(event.global_position)
@@ -22,7 +20,6 @@ func _input(event: InputEvent) -> void:
 			_toolbar._on_brush_color_changed(color)
 
 
-# -------------------------------------------------------------------------------------------------
 func _pick_color() -> Color:
 	var img: Image = _canvas.take_screenshot()
 

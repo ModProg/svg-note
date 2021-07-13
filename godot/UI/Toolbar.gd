@@ -13,12 +13,10 @@ signal brush_size_changed(size)
 signal canvas_background_changed(color)
 signal tool_changed(t)
 
-# -------------------------------------------------------------------------------------------------
 const BUTTON_HOVER_COLOR = Color("50ffd6")
 const BUTTON_CLICK_COLOR = Color("50ffd6")
 const BUTTON_NORMAL_COLOR = Color.white
 
-# -------------------------------------------------------------------------------------------------
 export var file_dialog_path: NodePath
 export var brush_color_picker_path: NodePath
 export var background_color_picker_path: NodePath
@@ -49,7 +47,6 @@ var _size_mode: int = 0
 var _last_size: Vector2
 
 
-# -------------------------------------------------------------------------------------------------
 func _ready():
 	var brush_size: int = Settings.get_value(
 		Settings.GENERAL_DEFAULT_BRUSH_SIZE, Config.DEFAULT_BRUSH_SIZE
@@ -70,7 +67,8 @@ func _ready():
 
 
 # IconButton clicked callbacks
-# -------------------------------------------------------------------------------------------------
+
+
 func _on_NewFileButton_pressed():
 	emit_signal("new_project")
 
@@ -87,7 +85,6 @@ func _on_RedoButton_pressed():
 	emit_signal("redo_action")
 
 
-# -------------------------------------------------------------------------------------------------
 func enable_tool(tool_type: int) -> void:
 	var btn: IconButton
 	match tool_type:
@@ -107,7 +104,6 @@ func enable_tool(tool_type: int) -> void:
 	emit_signal("tool_changed", tool_type)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_OpenFileButton_pressed():
 	var file_dialog: FileDialog = get_node(file_dialog_path)
 	file_dialog.mode = FileDialog.MODE_OPEN_FILE
@@ -117,29 +113,24 @@ func _on_OpenFileButton_pressed():
 	file_dialog.popup_centered()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_project_selected_to_open(filepath: String) -> void:
 	emit_signal("open_project", filepath)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_SaveFileButton_pressed():
 	emit_signal("save_project")
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_file_dialog_closed() -> void:
 	var file_dialog: FileDialog = get_node(file_dialog_path)
 	Utils.remove_signal_connections(file_dialog, "file_selected")
 	Utils.remove_signal_connections(file_dialog, "popup_hide")
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_ColorButton_pressed():
 	_brush_color_picker_popup.popup()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_brush_color_changed(color: Color) -> void:
 	_color_button.get("custom_styles/normal").bg_color = color
 	var text_color := color.inverted()
@@ -150,59 +141,49 @@ func _on_brush_color_changed(color: Color) -> void:
 	emit_signal("brush_color_changed", color)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_background_color_changed(color: Color) -> void:
 	emit_signal("canvas_background_changed", color)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_BrushSizeSlider_value_changed(value: float):
 	var new_size := int(value)
 	_brush_size_label.text = "%d" % new_size
 	emit_signal("brush_size_changed", new_size)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_BrushToolButton_pressed():
 	_change_active_tool_button(_tool_btn_brush)
 	emit_signal("tool_changed", Types.Tool.BRUSH)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_LineToolButton_pressed():
 	_change_active_tool_button(_tool_btn_line)
 	emit_signal("tool_changed", Types.Tool.LINE)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_EraserToolButton_pressed():
 	_change_active_tool_button(_tool_btn_eraser)
 	emit_signal("tool_changed", Types.Tool.ERASER)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_ColorPickerToolButton_pressed():
 	_change_active_tool_button(_tool_btn_colorpicker)
 	emit_signal("tool_changed", Types.Tool.COLOR_PICKER)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_SelectToolButton_pressed():
 	_change_active_tool_button(_tool_btn_selection)
 	emit_signal("tool_changed", Types.Tool.SELECT)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_BackgroundColorButton_pressed():
 	_background_color_picker_popup.popup()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_GridButton_toggled(toggled: bool):
 	emit_signal("grid_enabled", toggled)
 
 
-# -------------------------------------------------------------------------------------------------
 func _change_active_tool_button(btn: IconButton) -> void:
 	if _last_active_tool_button != null:
 		_last_active_tool_button.toggle()
@@ -219,7 +200,6 @@ func _on_Toolbar_resized() -> void:
 		_size_mode -= 1
 
 
-# -------------------------------------------------------------------------------------------------
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_THEME_CHANGED:

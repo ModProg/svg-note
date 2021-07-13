@@ -3,6 +3,7 @@ extends InputEventAction
 
 var position
 
+
 func _init(e):
 	position = e.position
 

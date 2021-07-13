@@ -5,8 +5,6 @@ const TARGET_FPS_BACKGROUND := 10
 
 export var size_theme: Theme
 
-
-# -------------------------------------------------------------------------------------------------
 onready var _canvas: InfiniteCanvas = $InfiniteCanvas
 onready var _statusbar: Statusbar = $Statusbar
 onready var _menubar: Menubar = $Bars/Menubar
@@ -21,9 +19,6 @@ onready var _exit_dialog: WindowDialog = $ExitDialog
 onready var _unsaved_changes_dialog: WindowDialog = $UnsavedChangesDialog
 onready var _background_color_picker: ColorPicker = $BackgroundColorPickerPopup/PanelContainer/ColorPicker
 
-#var svg: StaticUtil = StaticUtil.new()
-
-# -------------------------------------------------------------------------------------------------
 func _ready():
 	# Init stuff
 	OS.set_window_title("Lorien v%s" % Config.VERSION_STRING)
@@ -84,7 +79,6 @@ func _ready():
 		Layout.apply_themes(theme, [Layout.scale_theme(size_theme.duplicate())])
 
 
-# -------------------------------------------------------------------------------------------------
 func _notification(what):
 	if NOTIFICATION_WM_QUIT_REQUEST == what:
 		if ! _exit_dialog.visible:
@@ -104,13 +98,11 @@ func _notification(what):
 			_canvas.disable()
 
 
-# -------------------------------------------------------------------------------------------------
 func _exit_tree():
 	_menubar.remove_all_tabs()
 	ProjectManager.remove_all_projects()
 
 
-# -------------------------------------------------------------------------------------------------
 func _process(delta):
 	_handle_shortcut_actions()
 	_statusbar.set_stroke_count(_canvas.info.stroke_count)
@@ -127,7 +119,6 @@ func _process(delta):
 		_menubar.update_tab_title(active_project)
 
 
-# -------------------------------------------------------------------------------------------------
 func _handle_shortcut_actions() -> void:
 	if ! _is_dialog_open():
 		if Input.is_action_just_pressed("shortcut_new_project"):
@@ -152,14 +143,12 @@ func _handle_shortcut_actions() -> void:
 			_toolbar.enable_tool(Types.Tool.SELECT)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_files_dropped(files: PoolStringArray, screen: int) -> void:
 	for file in files:
 		if Utils.is_valid_lorien_file(file):
 			_on_open_project(file)
 
 
-# -------------------------------------------------------------------------------------------------
 func _make_project_active(project: Project) -> void:
 	ProjectManager.active_project = project
 	_canvas.use_project(project)
@@ -170,12 +159,13 @@ func _make_project_active(project: Project) -> void:
 
 	# TODO: find a better way to apply the color to the picker
 	var default_canvas_color = Config.DEFAULT_CANVAS_COLOR.to_html()
+
+
 #	_background_color_picker.color = Color(
 #		project.meta_data.get(ProjectMetadata.CANVAS_COLOR, default_canvas_color)
 #	)
 
 
-# -------------------------------------------------------------------------------------------------
 func _is_mouse_on_ui() -> bool:
 	# FIXME: this is really long line.... It's also pretty hacky, so replace with something better sometime
 	return (
@@ -188,7 +178,6 @@ func _is_mouse_on_ui() -> bool:
 	)
 
 
-# -------------------------------------------------------------------------------------------------
 func _is_dialog_open() -> bool:
 	return (
 		_file_dialog.visible
@@ -198,13 +187,11 @@ func _is_dialog_open() -> bool:
 	)
 
 
-# -------------------------------------------------------------------------------------------------
 func _create_active_default_project() -> void:
 	var default_project: Project = ProjectManager.add_project()
 	_make_project_active(default_project)
 
 
-# -------------------------------------------------------------------------------------------------
 func _save_project(project: Project) -> void:
 	var meta_data = ProjectMetadata.make_dict(_canvas)
 	#project.meta_data = meta_data
@@ -212,18 +199,15 @@ func _save_project(project: Project) -> void:
 	_menubar.update_tab_title(project)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_create_new_project() -> void:
 	_create_active_default_project()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_project_selected(project_id: int) -> void:
 	var project: Project = ProjectManager.get_project_by_id(project_id)
 	_make_project_active(project)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_project_closed(project: Project) -> void:
 	# Ask the user to save changes
 	if project.dirty:
@@ -234,7 +218,6 @@ func _on_project_closed(project: Project) -> void:
 		_close_project(project)
 
 
-# -------------------------------------------------------------------------------------------------
 func _close_project(project: Project) -> void:
 	var active_project_closed := ProjectManager.is_active_project(project)
 
@@ -252,28 +235,23 @@ func _close_project(project: Project) -> void:
 			_make_project_active(new_project)
 
 
-# -------------------------------------------------------------------------------------------------
 func _show_autosave_not_implemented_alert() -> void:
 	_generic_alert_dialog.dialog_text = tr("ERROR_AUTOSAVE_NOT_IMPLEMENTED")
 	_generic_alert_dialog.popup_centered()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_brush_color_changed(color: Color) -> void:
 	_canvas.set_brush_color(color)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_brush_size_changed(size: int) -> void:
 	_canvas.set_brush_size(size)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_clear_canvas() -> void:
 	_canvas.clear()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_open_project(filepath: String) -> bool:
 	# Check if file exists
 	var file := File.new()
@@ -301,7 +279,6 @@ func _on_open_project(filepath: String) -> bool:
 	return true
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_save_project_as() -> void:
 	var active_project: Project = ProjectManager.get_active_project()
 	_canvas.disable()
@@ -313,7 +290,6 @@ func _on_save_project_as() -> void:
 	_file_dialog.popup_centered()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_save_project() -> void:
 	var active_project: Project = ProjectManager.active_project
 	if active_project.filepath.empty():
@@ -327,20 +303,17 @@ func _on_save_project() -> void:
 		_save_project(active_project)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_file_dialog_closed() -> void:
 	_file_dialog.disconnect("file_selected", self, "_on_file_selected_to_save_project")
 	_file_dialog.disconnect("popup_hide", self, "_on_file_dialog_closed")
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_file_selected_to_save_project(filepath: String) -> void:
 	var active_project: Project = ProjectManager.active_project
 	active_project.filepath = filepath
 	_save_project(active_project)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_canvas_background_changed(color: Color) -> void:
 	_canvas.set_background_color(color)
 	var project: Project = ProjectManager.get_active_project()
@@ -348,31 +321,26 @@ func _on_canvas_background_changed(color: Color) -> void:
 		project.dirty = true
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_grid_enabled(enabled: bool) -> void:
 	_canvas.enable_grid(enabled)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_undo_action() -> void:
 	var project: Project = ProjectManager.get_active_project()
 	if project.undo_redo.has_undo():
 		project.undo_redo.undo()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_redo_action() -> void:
 	var project: Project = ProjectManager.get_active_project()
 	if project.undo_redo.has_redo():
 		project.undo_redo.redo()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_tool_changed(tool_type: int) -> void:
 	_canvas.use_tool(tool_type)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_exit_with_changes_saved(project_ids: Array) -> void:
 	if ProjectManager.has_unsaved_projects():
 		_show_autosave_not_implemented_alert()
@@ -381,12 +349,10 @@ func _on_exit_with_changes_saved(project_ids: Array) -> void:
 		get_tree().quit()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_exit_with_changes_discarded(project_ids: Array) -> void:
 	get_tree().quit()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_close_file_with_changes_saved(project_ids: Array) -> void:
 	for id in project_ids:
 		var project: Project = ProjectManager.get_project_by_id(id)
@@ -398,41 +364,34 @@ func _on_close_file_with_changes_saved(project_ids: Array) -> void:
 	_unsaved_changes_dialog.hide()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_close_file_with_changes_discarded(project_ids: Array) -> void:
 	for id in project_ids:
 		_close_project(id)
 	_unsaved_changes_dialog.hide()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_open_about_dialog() -> void:
 	_about_dialog.popup()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_open_settings_dialog() -> void:
 	_settings_dialog.popup()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_open_url(url: String) -> void:
 	OS.shell_open(url)
 	yield(get_tree().create_timer(0.1), "timeout")
 	_canvas.disable()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_InfiniteCanvas_mouse_entered():
 	_canvas.enable()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_InfiniteCanvas_mouse_exited():
 	_canvas.disable()
 
 
-# --------------------------------------------------------------------------------------------------
 func _on_export_confirmed(path: String):
 	match path.get_extension():
 		"png":
@@ -441,7 +400,6 @@ func _on_export_confirmed(path: String):
 			image.save_png(path)
 
 
-# --------------------------------------------------------------------------------------------------
 func _export_as(export_type: int) -> void:
 	match export_type:
 		Types.ExportType.PNG:

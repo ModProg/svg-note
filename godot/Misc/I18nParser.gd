@@ -1,10 +1,8 @@
 class_name I18nParser
 
-# -------------------------------------------------------------------------------------------------
 const I18N_FOLDER := "res://Assets/I18n/"
 
 
-# -------------------------------------------------------------------------------------------------
 class ParseResult:
 	var locales := PoolStringArray()
 	var language_names := PoolStringArray()
@@ -14,7 +12,6 @@ class ParseResult:
 		language_names.append(lang_name)
 
 
-# -------------------------------------------------------------------------------------------------
 func load_files() -> ParseResult:
 	var result = ParseResult.new()
 	for f in _get_i18n_files():
@@ -56,7 +53,6 @@ func load_files() -> ParseResult:
 	return result
 
 
-# -------------------------------------------------------------------------------------------------
 func _get_i18n_files() -> Array:
 	var files := []
 	var dir = Directory.new()

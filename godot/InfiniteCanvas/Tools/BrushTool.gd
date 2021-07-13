@@ -1,15 +1,11 @@
 class_name BrushTool
 extends DrawTool
 
-# -------------------------------------------------------------------------------------------------
 enum Mode { DRAW, ERASE }
-
-# -------------------------------------------------------------------------------------------------
 
 var mode: int = Mode.DRAW
 
 
-# -------------------------------------------------------------------------------------------------
 func _input(event: InputEvent) -> void:
 	_cursor.set_pressure(1.0)
 	if touch:
@@ -17,11 +13,11 @@ func _input(event: InputEvent) -> void:
 			if event is InputEventMouseMotion:
 				if event.pressure > 0:
 					_last_mouse_motion = event
-					if !performing_stroke:
+					if ! performing_stroke:
 						start_stroke(mode == Mode.ERASE)
 				elif performing_stroke:
 					end_stroke()
-				
+
 		else:
 			pass
 	else:
@@ -41,7 +37,6 @@ func _input(event: InputEvent) -> void:
 					end_stroke()
 
 
-# -------------------------------------------------------------------------------------------------
 func _process(delta: float) -> void:
 	if performing_stroke && _last_mouse_motion != null:
 		var brush_position: Vector2 = xform_vector2(_last_mouse_motion.global_position)

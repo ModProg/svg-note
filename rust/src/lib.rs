@@ -2,13 +2,18 @@
 use std::str::FromStr;
 
 use gdnative::api::line_2d::{LineCapMode, LineJointMode};
-use gdnative::api::Line2D;
+use gdnative::api::{Line2D, Polygon2D};
 use gdnative::prelude::*;
-use svg_notes::elements::{Element, Line, Point};
+use svg_notes::elements::{Element, Line, LinePoint, Polyline, PolylinePoint};
 use svg_notes::{colors, Document};
 
 enum Shape2D {
     Line(Line, Ref<Line2D, Shared>),
+    Polyline(
+        Polyline,
+        Ref<Line2D, Shared>,
+        Option<Ref<Polygon2D, Shared>>,
+    ),
 }
 
 const MINDIST_INLINE: f32 = 2.0;
@@ -18,6 +23,12 @@ impl Shape2D {
     fn add_to(&self, node: TRef<Node2D>) {
         match self {
             Shape2D::Line(_, child) => node.add_child(child, false),
+            Shape2D::Polyline(_, line, polygon) => {
+                node.add_child(line, false);
+                if let Some(polygon) = polygon {
+                    node.add_child(polygon, false);
+                }
+            }
         }
     }
 
@@ -30,7 +41,25 @@ impl Shape2D {
                     .iter()
                     // .iter().zip(node.points().read().iter())
                     // .skip(node.points().len() as usize)
-                    .for_each(|&Point(x, y, _)| node.add_point(Vector2::new(x, y), -1))
+                    .for_each(|&LinePoint(x, y, _)| node.add_point(Vector2::new(x, y), -1))
+            }
+            Shape2D::Polyline(line, stroke, polygon) => {
+                let node = unsafe { stroke.assume_safe() };
+                let polygon = polygon.map(|polygon| unsafe { polygon.assume_safe() });
+                node.clear_points();
+                if let Some(polygon) = polygon {
+                    polygon.set_polygon(
+                        line.points
+                            .iter()
+                            .map(|&PolylinePoint(x, y)| Vector2::new(x, y))
+                            .collect(),
+                    )
+                }
+                line.points
+                    .iter()
+                    // .iter().zip(node.points().read().iter())
+                    // .skip(node.points().len() as usize)
+                    .for_each(|&PolylinePoint(x, y)| node.add_point(Vector2::new(x, y), -1))
             }
         }
     }
@@ -38,7 +67,23 @@ impl Shape2D {
     fn draw_to(&mut self, position: Vector2, width: f32) {
         match self {
             Shape2D::Line(line, _) => {
-                let new = Point(position.x, position.y, width);
+                let new = LinePoint(position.x, position.y, width);
+                if line.points.len() > 1
+                    && line.points[line.points.len() - 2]
+                        .distance_to(line.points[line.points.len() - 1])
+                        < MINDIST_INLINE
+                {
+                    let l = line.points.len();
+                    line.points[l - 1] = new;
+                } else if line.points.len() == 0
+                    || line.points[line.points.len() - 1].distance_to(new) > MINDIST_NEW_POINT
+                {
+                    line.points.push(new);
+                } else {
+                }
+            }
+            Shape2D::Polyline(line, ..) => {
+                let new = PolylinePoint(position.x, position.y);
                 if line.points.len() > 1
                     && line.points[line.points.len() - 2]
                         .distance_to(line.points[line.points.len() - 1])
@@ -59,7 +104,8 @@ impl Shape2D {
 
     fn svg_elem(&self) -> Element {
         match self {
-            Shape2D::Line(line, _) => Element::Line(line.clone(), 0),
+            Shape2D::Line(line, _) => Element::Line(line.clone()),
+            Shape2D::Polyline(line, ..) => Element::Polyline(line.clone()),
         }
     }
 
@@ -72,18 +118,30 @@ impl Shape2D {
                     _unit: position._unit,
                 }) < p.2 + width
             }),
+            Shape2D::Polyline(_, ..) => todo!(),
         }
     }
 
     fn erase(&self) {
         match self {
             Shape2D::Line(_, line2d) => unsafe { line2d.assume_safe() }.hide(),
+            Shape2D::Polyline(_, stroke, fill) => {
+                unsafe { stroke.assume_safe() }.hide();
+                if let Some(fill) = fill.map(|fill| unsafe {
+                    {
+                        fill.assume_safe()
+                    }
+                }) {
+                    fill.hide()
+                }
+            }
         }
     }
 
     fn erased(&self) -> bool {
         match self {
             Shape2D::Line(_, line2d) => !unsafe { line2d.assume_safe() }.is_visible(),
+            Shape2D::Polyline(_, ..) => todo!(),
         }
     }
 }
@@ -108,13 +166,34 @@ impl From<Line> for Shape2D {
         Shape2D::Line(line, line2d.into_shared())
     }
 }
+impl From<Polyline> for Shape2D {
+    fn from(line: Polyline) -> Self {
+        let stroke = Line2D::new();
+        stroke.set_width(line.width.into());
+        stroke.set_antialiased(true);
+        stroke.set_end_cap_mode(LineCapMode::ROUND.into());
+        stroke.set_begin_cap_mode(LineCapMode::ROUND.into());
+        stroke.set_joint_mode(LineJointMode::ROUND.into());
+        stroke.set_default_color(color_s2g(line.stroke));
+        let fill = if line.fill.a > 0 {
+            let fill = Polygon2D::new();
+            fill.set_antialiased(true);
+            fill.set_color(color_s2g(line.fill));
+            Some(fill)
+        } else {
+            None
+        };
+        Shape2D::Polyline(line, stroke.into_shared(), fill.map(Ref::into_shared))
+    }
+}
 
 impl From<Element> for Shape2D {
     fn from(e: Element) -> Self {
         match e {
-            Element::Line(line, _) => line.into(),
-            Element::Ngon(_, _) => todo!(),
-            Element::Ellipse(_, _) => todo!(),
+            Element::Line(line) => line.into(),
+            Element::Ngon(_) => todo!(),
+            Element::Ellipse(_) => todo!(),
+            Element::Polyline(polyline) => polyline.into(),
         }
     }
 }
@@ -184,6 +263,23 @@ impl Project {
     fn new_line(&mut self, _owner: &Reference, color: core_types::Color, width: f32) -> bool {
         let line: Shape2D = Line {
             color: color_g2s(color),
+            width,
+            points: vec![],
+        }
+        .into();
+        if let Some(canvas) = self.canvas {
+            let canvas = unsafe { canvas.assume_safe() };
+            line.add_to(canvas)
+        }
+        self.shapes.push(line);
+        true
+    }
+
+    #[export]
+    fn new_polyline(&mut self, _owner: &Reference, color: core_types::Color, width: f32) -> bool {
+        let line: Shape2D = Polyline {
+            stroke: color_g2s(color),
+            fill: color_g2s(color).with_opacity(color.a / 2.),
             width,
             points: vec![],
         }

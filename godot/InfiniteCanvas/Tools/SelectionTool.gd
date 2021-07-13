@@ -1,7 +1,6 @@
 class_name SelectionTool
 extends CanvasTool
 
-# -------------------------------------------------------------------------------------------------
 const META_OFFSET := "offset"
 const GROUP_SELECTED_STROKES := "selected_strokes"  # selected strokes
 const GROUP_STROKES_IN_SELECTION_RECTANGLE := "strokes_in_selection_rectangle"  # strokes that are in selection rectangle but not commit (i.e. the user is still selecting)
@@ -9,7 +8,6 @@ const GROUP_MARKED_FOR_DESELECTION := "strokes_marked_for_deselection"  # stroke
 
 enum State { NONE, SELECTING, MOVING }
 
-# -------------------------------------------------------------------------------------------------
 export var selection_rectangle_path: NodePath
 var _selection_rectangle: SelectionRectangle
 var _state = State.NONE
@@ -141,13 +139,11 @@ func _add_undoredo_action_for_moved_strokes() -> void:
 	project.dirty = true
 
 
-# -------------------------------------------------------------------------------------------------
 func _offset_selected_strokes(offset: Vector2) -> void:
 	for stroke in get_selected_strokes():
 		stroke.set_meta(META_OFFSET, stroke.position - offset)
 
 
-# -------------------------------------------------------------------------------------------------
 func _move_selected_strokes() -> void:
 	for stroke in get_selected_strokes():
 		stroke.global_position = stroke.get_meta(META_OFFSET) + _cursor.global_position

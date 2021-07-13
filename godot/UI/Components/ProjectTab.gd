@@ -1,15 +1,12 @@
 extends PanelContainer
 class_name ProjectTab
 
-# -------------------------------------------------------------------------------------------------
 const STYLE_ACTIVE = preload("res://UI/Themes/style_tab_active_dark.tres")
 const STYLE_INACTIVE = preload("res://UI/Themes/style_tab_inactive_dark.tres")
 
-# -------------------------------------------------------------------------------------------------
 signal selected
 signal close_requested
 
-# -------------------------------------------------------------------------------------------------
 onready var _filename_button: Button = $HBoxContainer/FilenameButton
 onready var _close_button: IconButton = $HBoxContainer/CloseButton
 
@@ -18,30 +15,25 @@ var title: String setget set_title
 var project: Project
 
 
-# -------------------------------------------------------------------------------------------------
 func _ready():
 	set_active(false)
 	_filename_button.text = title
 
 
-# -------------------------------------------------------------------------------------------------
 func set_title(t: String) -> void:
 	title = t
 	if _filename_button != null:
 		_filename_button.text = title
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_FilenameButton_pressed():
 	emit_signal("selected", self)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_CloseButton_pressed():
 	emit_signal("close_requested", self)
 
 
-# -------------------------------------------------------------------------------------------------
 func set_active(active: bool) -> void:
 	is_active = active
 	var new_style = STYLE_INACTIVE

@@ -1,7 +1,7 @@
 tool
 extends Button
 class_name IconButton, "res://Assets/Icons/Editor/icon_button.svg"
-# -------------------------------------------------------------------------------------------------
+
 export var normal_icon_name: String setget _set_normal_icon
 export var pressed_icon_name: String setget _set_pressed_icon
 export var small: bool setget _set_small
@@ -75,44 +75,37 @@ func _init() -> void:
 	cc.add_child(_ic)
 
 
-# -------------------------------------------------------------------------------------------------
 func _ready() -> void:
 	connect("mouse_entered", self, "_on_mouse_entered")
 	connect("mouse_exited", self, "_on_mouse_exited")
 	connect("pressed", self, "_on_pressed")
 
 
-# -------------------------------------------------------------------------------------------------
 func _exit_tree() -> void:
 	disconnect("mouse_entered", self, "_on_mouse_entered")
 	disconnect("mouse_exited", self, "_on_mouse_exited")
 	disconnect("pressed", self, "_on_pressed")
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_mouse_entered() -> void:
 	_hovered = true
 	_update_state()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_mouse_exited() -> void:
 	_hovered = false
 	_update_state()
 
 
-# -------------------------------------------------------------------------------------------------
 func toggle() -> void:
 	pressed = ! pressed
 	_update_state()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_pressed() -> void:
 	_update_state()
 
 
-# -------------------------------------------------------------------------------------------------
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_THEME_CHANGED:

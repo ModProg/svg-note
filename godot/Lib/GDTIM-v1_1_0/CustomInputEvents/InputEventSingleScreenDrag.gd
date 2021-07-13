@@ -5,6 +5,7 @@ var position
 var relative
 var speed
 
+
 func _init(e):
 	position = e.position
 	relative = e.relative
@@ -12,4 +13,11 @@ func _init(e):
 
 
 func as_text():
-	return "InputEventSingleScreenDrag : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
+	return (
+		"InputEventSingleScreenDrag : position="
+		+ str(position)
+		+ ", relative="
+		+ str(relative)
+		+ ", speed="
+		+ str(speed)
+	)

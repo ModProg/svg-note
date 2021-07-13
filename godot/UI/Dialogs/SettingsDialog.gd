@@ -1,6 +1,5 @@
 extends WindowDialog
 
-# -------------------------------------------------------------------------------------------------
 const THEME_DARK_INDEX := 0
 const THEME_LIGHT_INDEX := 1
 
@@ -8,7 +7,6 @@ const AA_NONE_INDEX := 0
 const AA_OPENGL_HINT_INDEX := 1
 const AA_TEXTURE_FILL_INDEX := 2
 
-# -------------------------------------------------------------------------------------------------
 onready var _tab_general: Control = $MarginContainer/TabContainer/General
 onready var _tab_appearance: Control = $MarginContainer/TabContainer/Appearance
 onready var _tab_rendering: Control = $MarginContainer/TabContainer/Rendering
@@ -24,7 +22,6 @@ onready var _rendering_restart_label: Label = $MarginContainer/TabContainer/Rend
 onready var _language_options: OptionButton = $MarginContainer/TabContainer/General/VBoxContainer/Language/OptionButton
 
 
-# -------------------------------------------------------------------------------------------------
 func _ready():
 	_tab_general.name = tr("SETTINGS_GENERAL")
 	_tab_appearance.name = tr("SETTINGS_APPEARANCE")
@@ -32,7 +29,6 @@ func _ready():
 	_set_values()
 
 
-# -------------------------------------------------------------------------------------------------
 func _set_values() -> void:
 	var brush_size = Settings.get_value(
 		Settings.GENERAL_DEFAULT_BRUSH_SIZE, Config.DEFAULT_BRUSH_SIZE
@@ -69,7 +65,6 @@ func _set_values() -> void:
 	_project_dir.text = project_dir
 
 
-# -------------------------------------------------------------------------------------------------
 func _set_languages(current_locale: String) -> void:
 	# Technically, Settings.language_names is useless from here on out, but I figure it's probably gonna come in handy in the future
 	var sorted_languages := Array(Settings.language_names)
@@ -90,22 +85,18 @@ func _set_languages(current_locale: String) -> void:
 	_language_options.selected = _language_options.get_item_index(id)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_DefaultBrushSize_value_changed(value: int) -> void:
 	Settings.set_value(Settings.GENERAL_DEFAULT_BRUSH_SIZE, int(value))
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_DefaultBrushColor_color_changed(color: Color) -> void:
 	Settings.set_value(Settings.GENERAL_DEFAULT_BRUSH_COLOR, color)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_DefaultCanvasColor_color_changed(color: Color) -> void:
 	Settings.set_value(Settings.GENERAL_DEFAULT_CANVAS_COLOR, color)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_DefaultSaveDir_text_changed(text: String) -> void:
 	text = text.replace("\\", "/")
 
@@ -114,7 +105,6 @@ func _on_DefaultSaveDir_text_changed(text: String) -> void:
 		Settings.set_value(Settings.GENERAL_DEFAULT_PROJECT_DIR, text)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_Theme_item_selected(index: int):
 	var theme: int
 	match index:
@@ -127,7 +117,6 @@ func _on_Theme_item_selected(index: int):
 	_appearence_restart_label.show()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_AntiAliasing_item_selected(index: int):
 	var aa_mode: int
 	match index:
@@ -142,7 +131,6 @@ func _on_AntiAliasing_item_selected(index: int):
 	_rendering_restart_label.show()
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_OptionButton_item_selected(idx: int):
 	var id := _language_options.get_item_id(idx)
 	var locale: String = Settings.locales[id]

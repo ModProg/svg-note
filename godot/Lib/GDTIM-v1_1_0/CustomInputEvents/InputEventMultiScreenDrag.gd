@@ -5,19 +5,27 @@ var position
 var relative
 var speed
 
+
 func _init(dict):
 	if dict.has("position"):
-		self.position = dict["position"] 
-		self.relative = dict["relative"] 
-		self.speed    = dict["speed"] 
+		self.position = dict["position"]
+		self.relative = dict["relative"]
+		self.speed = dict["speed"]
 	else:
-		self.position = get_events_property_avg(dict,"position")
-		self.relative = get_events_property_avg(dict,"relative") / dict.size()
-		self.speed    = get_events_property_avg(dict,"speed")
+		self.position = get_events_property_avg(dict, "position")
+		self.relative = get_events_property_avg(dict, "relative") / dict.size()
+		self.speed = get_events_property_avg(dict, "speed")
 
 
 func as_text():
-	return "InputEventMultiScreenDrag : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
+	return (
+		"InputEventMultiScreenDrag : position="
+		+ str(position)
+		+ ", relative="
+		+ str(relative)
+		+ ", speed="
+		+ str(speed)
+	)
 
 
 # Aux.

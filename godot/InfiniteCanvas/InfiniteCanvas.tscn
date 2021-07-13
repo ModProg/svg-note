@@ -17,20 +17,22 @@
 [ext_resource path="res://Lib/GestureControlledCamera2D/GCC2D.tscn" type="PackedScene" id=16]
 [ext_resource path="res://InfiniteCanvas/Tools/EraseTool.gd" type="Script" id=17]
 
-[sub_resource type="Curve" id=3]
+[sub_resource type="Curve" id=1]
 _data = [ Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
 
-[sub_resource type="ShaderMaterial" id=1]
+[sub_resource type="ShaderMaterial" id=2]
 shader = ExtResource( 10 )
 shader_param/background_color = null
 
-[sub_resource type="ShaderMaterial" id=2]
+[sub_resource type="ShaderMaterial" id=4]
 shader = ExtResource( 15 )
 shader_param/canvas_color = null
 
 [node name="InfiniteCanvas" type="ViewportContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_left = -1.33484
+margin_right = -1.33484
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -39,7 +41,7 @@ __meta__ = {
 [node name="EraserTool" type="Node" parent="."]
 script = ExtResource( 17 )
 cursor_path = NodePath("../Viewport/BrushCursor")
-pressure_curve = SubResource( 3 )
+pressure_curve = SubResource( 1 )
 
 [node name="BrushTool" type="Node" parent="."]
 script = ExtResource( 5 )
@@ -59,7 +61,7 @@ script = ExtResource( 13 )
 cursor_path = NodePath("../Viewport/ColorPickerCursor")
 
 [node name="SelectionRectangle" type="Node2D" parent="."]
-material = SubResource( 1 )
+material = SubResource( 2 )
 script = ExtResource( 9 )
 
 [node name="Viewport" type="Viewport" parent="."]
@@ -81,8 +83,12 @@ zoom_curve = ExtResource( 14 )
 
 [node name="Strokes" type="Node2D" parent="Viewport"]
 
+[node name="MeshInstance2D" type="Polygon2D" parent="Viewport/Strokes"]
+color = Color( 1, 1, 1, 0.635294 )
+polygon = PoolVector2Array( 684.386, 262.165, 853.307, 566.842, 1706.87, 489.087, 1626.9, 283.36, 1369.16, 115.332, 502.848, 55.2643 )
+
 [node name="Grid" type="Node2D" parent="Viewport"]
-material = SubResource( 2 )
+material = SubResource( 4 )
 script = ExtResource( 12 )
 camera_path = NodePath("../GCC2D")
 

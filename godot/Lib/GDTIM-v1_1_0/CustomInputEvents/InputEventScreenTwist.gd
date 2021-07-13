@@ -5,23 +5,33 @@ var position
 var relative
 var speed
 
+
 func _init(dict):
 	if dict.has("position"):
-		position = dict["position"] 
-		relative = dict["relative"] 
-		speed    = dict["speed"] 
+		position = dict["position"]
+		relative = dict["relative"]
+		speed = dict["speed"]
 	else:
 		position = get_events_property_avg(dict, "position")
-		speed    = get_events_property_avg_length(dict, "speed")
-		
+		speed = get_events_property_avg_length(dict, "speed")
+
 		relative = 0
 		for e in dict.values():
-			relative += (e.position - position).angle_to(e.position + (e.relative / dict.size()) - position)
+			relative += (e.position - position).angle_to(
+				e.position + (e.relative / dict.size()) - position
+			)
 		relative = (relative / dict.size())
 
 
 func as_text():
-	return "InputEventScreenTwist : position=" + str(position) + ", relative=" + str(relative) + ", speed=" + str(speed)
+	return (
+		"InputEventScreenTwist : position="
+		+ str(position)
+		+ ", relative="
+		+ str(relative)
+		+ ", speed="
+		+ str(speed)
+	)
 
 
 # Aux.

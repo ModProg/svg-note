@@ -4,7 +4,6 @@ class_name Serializer
 # TODO: !IMPORTANT! all of this needs validation
 # TODO: !IMPORTANT! all of this needs validation
 
-# -------------------------------------------------------------------------------------------------
 const BRUSH_STROKE = preload("res://BrushStroke/BrushStroke.tscn")
 const COMPRESSION_METHOD = File.COMPRESSION_DEFLATE
 const POINT_ELEM_SIZE := 3
@@ -13,13 +12,12 @@ const VERSION_NUMBER := 0
 const TYPE_BRUSH_STROKE := 0
 const TYPE_ERASER_STROKE := 1
 
-# -------------------------------------------------------------------------------------------------
 static func save_project(project: Project) -> void:
 	var start_time := OS.get_ticks_msec()
 
 	# Open file
 #	var svg := SvgLib.new()
-	var ser: String = str(project);
+	var ser: String = str(project)
 	print_debug(ser)
 	var file := File.new()
 	var err = file.open(project.filepath, File.WRITE)
@@ -63,7 +61,6 @@ static func save_project(project: Project) -> void:
 	file.close()
 	print("Saved %s in %d ms" % [project.filepath, OS.get_ticks_msec() - start_time])
 
-# -------------------------------------------------------------------------------------------------
 static func load_project(path: String) -> Project:
 	var start_time := OS.get_ticks_msec()
 	var project := Project.new()
@@ -83,7 +80,6 @@ static func load_project(path: String) -> Project:
 	print("Loaded %s in %d ms" % [project.filepath, OS.get_ticks_msec() - start_time])
 	return project
 
-# -------------------------------------------------------------------------------------------------
 static func _dict_to_metadata_str(d: Dictionary) -> String:
 	var meta_str := ""
 	for k in d.keys():
@@ -94,7 +90,6 @@ static func _dict_to_metadata_str(d: Dictionary) -> String:
 			print_debug("Metadata should be String key-value pairs only!")
 	return meta_str
 
-# -------------------------------------------------------------------------------------------------
 static func _metadata_str_to_dict(s: String) -> Dictionary:
 	var meta_dict := {}
 	for kv in s.split(",", false):

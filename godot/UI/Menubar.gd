@@ -1,22 +1,18 @@
 extends PanelContainer
 class_name Menubar
 
-# -------------------------------------------------------------------------------------------------
 const PROJECT_TAB = preload("res://UI/Components/ProjectTab.tscn")
 
-# -------------------------------------------------------------------------------------------------
 signal project_selected(project)
 signal project_closed(project)
 signal create_new_project
 
-# -------------------------------------------------------------------------------------------------
 onready var _file_tabs_container: HBoxContainer = $Left/Tabs
 export var _main_menu_path: NodePath
 var _active_file_tab: ProjectTab
 var _tabs_map: Dictionary  # Dictonary<Project, ProjectTab>
 
 
-# -------------------------------------------------------------------------------------------------
 func make_tab(project: Project) -> void:
 	var tab: ProjectTab = PROJECT_TAB.instance()
 	tab.title = project.filepath
@@ -72,27 +68,22 @@ func set_tab_active(project: Project) -> void:
 		print_debug("Project tab not found")
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_tab_close_requested(tab: ProjectTab) -> void:
 	emit_signal("project_closed", tab.project_id)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_tab_selected(tab: ProjectTab) -> void:
 	emit_signal("project_selected", tab.project_id)
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_NewFileButton_pressed():
 	emit_signal("create_new_project")
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_MenuButton_pressed():
 	get_node(_main_menu_path).popup()
 
 
-# -------------------------------------------------------------------------------------------------
 func get_first_project_id() -> int:
 	if _file_tabs_container.get_child_count() == 0:
 		return -1

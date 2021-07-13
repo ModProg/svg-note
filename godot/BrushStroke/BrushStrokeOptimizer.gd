@@ -3,12 +3,10 @@ class_name BrushStrokeOptimizer
 var points_removed := 0
 
 
-# -------------------------------------------------------------------------------------------------
 func reset() -> void:
 	points_removed = 0
 
 
-# -------------------------------------------------------------------------------------------------
 func optimize(s) -> void:
 	# TODO: if the FPS is low i should optimze less i.e. make these numbers smaller
 	var max_angle_diff = 4.0 if s.eraser else 1.0

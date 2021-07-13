@@ -1,24 +1,20 @@
 class_name SelectionCursor
 extends BaseCursor
 
-# -------------------------------------------------------------------------------------------------
 const CROSS_LENGTH: float = 10.0
 var MOVE_TEXTURE = preload("res://Assets/Cursors/move_cursor.png")
 var SELECT_TEXTURE = preload("res://Assets/Cursors/selection_cursor.png")
 
 enum Mode { MOVE, SELECT }
 
-# -------------------------------------------------------------------------------------------------
 var _cross_length: float = CROSS_LENGTH
 var mode = Mode.SELECT setget set_mode, get_mode
 
 
-# -------------------------------------------------------------------------------------------------
 func _on_zoom_changed(zoom_value: float) -> void:
 	scale = Vector2.ONE * zoom_value
 
 
-# -------------------------------------------------------------------------------------------------
 func set_mode(m: int) -> void:
 	mode = m
 	match mode:
@@ -28,6 +24,5 @@ func set_mode(m: int) -> void:
 			texture = SELECT_TEXTURE
 
 
-# -------------------------------------------------------------------------------------------------
 func get_mode() -> int:
 	return mode

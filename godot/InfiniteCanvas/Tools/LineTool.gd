@@ -1,16 +1,13 @@
 class_name LineTool
 extends DrawTool
 
-# -------------------------------------------------------------------------------------------------
 const SNAP_STEP := deg2rad(90.0 / 6.0)  # = 15 deg
 
-# -------------------------------------------------------------------------------------------------
 var _snapping_enabled := false
 var _head: Vector2
 var _tail: Vector2
 
 
-# -------------------------------------------------------------------------------------------------
 func _input(event: InputEvent) -> void:
 	_cursor.set_pressure(1.0)
 
@@ -41,7 +38,6 @@ func _input(event: InputEvent) -> void:
 				end_stroke()
 
 
-# -------------------------------------------------------------------------------------------------
 func _add_point_at_mouse_pos(pressure: float) -> Vector2:
 	var brush_position: Vector2 = _cursor.global_position
 	pressure = pressure_curve.interpolate(pressure)
@@ -49,7 +45,6 @@ func _add_point_at_mouse_pos(pressure: float) -> Vector2:
 	return brush_position
 
 
-# -------------------------------------------------------------------------------------------------
 func _add_point_at_snap_pos(pressure: float) -> Vector2:
 	var mouse_angle := _head.angle_to_point(_cursor.global_position) + (SNAP_STEP / 2.0)
 	var snapped_angle := floor(mouse_angle / SNAP_STEP) * SNAP_STEP
