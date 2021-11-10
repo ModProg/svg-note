@@ -1,26 +1,50 @@
-#![feature(drain_filter)]
-use std::str::FromStr;
+#![feature(drain_filter, duration_consts_2, backtrace)]
+use std::{
+    str::FromStr,
+    time::{Duration, Instant},
+};
 
-use gdnative::api::line_2d::{LineCapMode, LineJointMode};
-use gdnative::api::{Geometry, Line2D, Polygon2D};
-use gdnative::prelude::*;
-use svg_notes::elements::{Element, Line, LinePoint, Polyline, PolylinePoint};
-use svg_notes::{colors, Document};
+use gdnative::{
+    api::{
+        line_2d::{LineCapMode, LineJointMode},
+        Geometry, Line2D, Polygon2D,
+    },
+    prelude::*,
+};
+use itertools::{
+    FoldWhile::{Continue, Done},
+    Itertools,
+};
+use svg_notes::{
+    colors,
+    elements::{Element, Line, LinePoint, Polyline, PolylinePoint},
+    Document,
+};
 
 enum Shape2D {
     Line(Line, Ref<Line2D, Shared>),
-    Polyline(Polyline, Ref<Line2D, Shared>, Vec<Ref<Polygon2D, Shared>>),
+    Polyline {
+        polyline: Polyline,
+        stroke: Ref<Line2D, Shared>,
+        fill: Option<Ref<Polygon2D, Shared>>,
+        last_movement: Instant,
+    },
 }
 
 const MINDIST_INLINE: f32 = 2.0;
 const MINDIST_NEW_POINT: f32 = 0.2;
+const MAXDIST_NEW_SEG: f32 = 1.0;
+const DELAY_NEW_SEG: Duration = Duration::from_secs_f32(0.3);
 
 impl Shape2D {
     fn add_to(&self, node: TRef<Node2D>) {
         match self {
             Shape2D::Line(_, child) => node.add_child(child, false),
-            Shape2D::Polyline(_, line, polygon) => {
-                node.add_child(line, false);
+            Shape2D::Polyline { stroke, fill, .. } => {
+                node.add_child(stroke, false);
+                if let Some(fill) = fill {
+                    node.add_child(fill, false);
+                }
             }
         }
     }
@@ -32,54 +56,67 @@ impl Shape2D {
                 node.clear_points();
                 line.points
                     .iter()
-                    // .iter().zip(node.points().read().iter())
-                    // .skip(node.points().len() as usize)
                     .for_each(|&LinePoint(x, y, _)| node.add_point(Vector2::new(x, y), -1))
             }
-            Shape2D::Polyline(line, stroke, polygon2ds) => {
+            Shape2D::Polyline {
+                polyline,
+                stroke,
+                fill,
+                ..
+            } => {
                 let node = unsafe { stroke.assume_safe() };
                 node.clear_points();
-                if line.fill.a > 0 {
-                    // let polygon2ds = polygon2ds
-                    //     .iter()
-                    //     .map(|polygon| unsafe { polygon.assume_safe() });
-                    let polygons: Vec<_> = Geometry::godot_singleton()
-                        .merge_polygons_2d(
-                            line.points
-                                .iter()
-                                .map(|&PolylinePoint(x, y)| Vector2::new(x, y))
-                                .collect(),
-                            Vector2Array::new(),
-                        )
+                if polyline.fill.a > 0 {
+                    let fill = unsafe { fill.unwrap().assume_safe() };
+                    let line: Vec<PolylinePoint> = polyline
+                        .points
                         .iter()
-                        .map(|v| v.to_vector2_array())
-                        .collect();
-                    for i in 0..polygons.len() {
-                        if i >= polygon2ds.len() {
-                            godot_print!("Adding new polygon for i={}", i);
-                            let fill = Polygon2D::new();
-                            fill.set_antialiased(true);
-                            fill.set_color(color_s2g(line.fill));
-                            fill.set_polygon(polygons[i].clone());
-                            let fill = fill.into_shared();
-                            node.add_child(fill, false);
-                            polygon2ds.push(fill);
-                        } else {
-                            unsafe { polygon2ds.get_unchecked(i).assume_safe() }
-                                .set_polygon(polygons[i].clone())
-                        };
-                    }
-                    polygon2ds
-                        .iter()
-                        .skip(polygons.len())
-                        .map(|p| unsafe { p.assume_safe() })
-                        .for_each(|p| p.set_polygon(Vector2Array::new()))
+                        .fold_while(Vec::<PolylinePoint>::new(), |mut line, segment| {
+                            let mut intersection = None;
+                            for i in 1..line.len().max(1) - 1 {
+                                intersection = {
+                                    let intersection = Geometry::godot_singleton()
+                                        .segment_intersects_segment_2d(
+                                            Vector2::new(line[i - 1].0, line[i - 1].1),
+                                            Vector2::new(line[i].0, line[i].1),
+                                            Vector2::new(
+                                                line[line.len() - 1].0,
+                                                line[line.len() - 1].1,
+                                            ),
+                                            Vector2::new(segment.0, segment.1),
+                                        );
+                                    if intersection.is_nil() {
+                                        None
+                                    } else {
+                                        let vec = intersection.to_vector2();
+                                        Some((vec, i))
+                                    }
+                                };
+                                if intersection.is_some() {
+                                    break;
+                                }
+                            }
+                            if let Some((intersection, i)) = intersection {
+                                line.drain(0..i);
+                                line.insert(0, PolylinePoint(intersection.x, intersection.y));
+                                line.push(PolylinePoint(intersection.x, intersection.y));
+                                Done(line)
+                            } else {
+                                line.push(*segment);
+                                Continue(line)
+                            }
+                        })
+                        .into_inner();
+                    fill.set_polygon(
+                        line.iter()
+                            .map(|&PolylinePoint(x, y)| Vector2::new(x, y))
+                            .collect(),
+                    );
                 }
 
-                line.points
+                polyline
+                    .points
                     .iter()
-                    // .iter().zip(node.points().read().iter())
-                    // .skip(node.points().len() as usize)
                     .for_each(|&PolylinePoint(x, y)| node.add_point(Vector2::new(x, y), -1))
             }
         }
@@ -96,27 +133,38 @@ impl Shape2D {
                 {
                     let l = line.points.len();
                     line.points[l - 1] = new;
-                } else if line.points.len() == 0
+                } else if line.points.is_empty()
                     || line.points[line.points.len() - 1].distance_to(new) > MINDIST_NEW_POINT
                 {
                     line.points.push(new);
                 } else {
                 }
             }
-            Shape2D::Polyline(line, ..) => {
+            Shape2D::Polyline {
+                polyline,
+                last_movement,
+                ..
+            } => {
                 let new = PolylinePoint(position.x, position.y);
-                if line.points.len() > 1
-                    && line.points[line.points.len() - 2]
-                        .distance_to(line.points[line.points.len() - 1])
-                        < MINDIST_INLINE
-                {
-                    let l = line.points.len();
-                    line.points[l - 1] = new;
-                } else if line.points.len() == 0
-                    || line.points[line.points.len() - 1].distance_to(new) > MINDIST_NEW_POINT
-                {
-                    line.points.push(new);
+                if polyline.points.len() > 1 {
+                    let l = polyline.points.len();
+                    let moved = polyline.points[l - 1].distance_to(new) > MAXDIST_NEW_SEG;
+                    if !moved
+                        && polyline.points[l - 1].distance_to(polyline.points[l - 2])
+                            > MINDIST_INLINE
+                        && Instant::now().elapsed() > DELAY_NEW_SEG
+                    {
+                        polyline.points.push(new);
+                        *last_movement = Instant::now()
+                    } else {
+                        polyline.points[l - 1] = new;
+
+                        if moved {
+                            *last_movement = Instant::now()
+                        }
+                    }
                 } else {
+                    polyline.points.push(new);
                 }
             }
         }
@@ -126,7 +174,7 @@ impl Shape2D {
     fn svg_elem(&self) -> Element {
         match self {
             Shape2D::Line(line, _) => Element::Line(line.clone()),
-            Shape2D::Polyline(line, ..) => Element::Polyline(line.clone()),
+            Shape2D::Polyline { polyline, .. } => Element::Polyline(polyline.clone()),
         }
     }
 
@@ -139,14 +187,14 @@ impl Shape2D {
                     _unit: position._unit,
                 }) < p.2 + width
             }),
-            Shape2D::Polyline(_, ..) => todo!(),
+            Shape2D::Polyline { .. } => todo!(),
         }
     }
 
     fn erase(&self) {
         match self {
             Shape2D::Line(_, line2d) => unsafe { line2d.assume_safe() }.hide(),
-            Shape2D::Polyline(_, stroke, _) => {
+            Shape2D::Polyline { stroke, .. } => {
                 unsafe { stroke.assume_safe() }.hide();
             }
         }
@@ -155,7 +203,7 @@ impl Shape2D {
     fn erased(&self) -> bool {
         match self {
             Shape2D::Line(_, line2d) => !unsafe { line2d.assume_safe() }.is_visible(),
-            Shape2D::Polyline(_, ..) => todo!(),
+            Shape2D::Polyline { stroke, .. } => !unsafe { stroke.assume_safe() }.is_visible(),
         }
     }
 }
@@ -181,15 +229,28 @@ impl From<Line> for Shape2D {
     }
 }
 impl From<Polyline> for Shape2D {
-    fn from(line: Polyline) -> Self {
+    fn from(polyline: Polyline) -> Self {
         let stroke = Line2D::new();
-        stroke.set_width(line.width.into());
+        stroke.set_width(polyline.width.into());
         stroke.set_antialiased(true);
         stroke.set_end_cap_mode(LineCapMode::ROUND.into());
         stroke.set_begin_cap_mode(LineCapMode::ROUND.into());
         stroke.set_joint_mode(LineJointMode::ROUND.into());
-        stroke.set_default_color(color_s2g(line.stroke));
-        Shape2D::Polyline(line, stroke.into_shared(), vec![])
+        stroke.set_default_color(color_s2g(polyline.stroke));
+        let fill = if polyline.fill.a > 0 {
+            let fill = Polygon2D::new();
+            fill.set_antialiased(true);
+            fill.set_color(color_s2g(polyline.fill));
+            Some(fill.into_shared())
+        } else {
+            None
+        };
+        Shape2D::Polyline {
+            polyline,
+            stroke: stroke.into_shared(),
+            fill,
+            last_movement: Instant::now(),
+        }
     }
 }
 
@@ -238,18 +299,16 @@ impl Project {
 
     #[export]
     fn load(&mut self, _owner: &Reference, string: String) -> bool {
-        if self.shapes.len() > 0 {
+        if !self.shapes.is_empty() {
             false
+        } else if let Ok(Document { elements }) = Document::from_str(&string) {
+            self.shapes = elements.into_iter().map(Shape2D::from).collect();
+            self.shapes.iter_mut().for_each(|s| {
+                s.generate();
+            });
+            true
         } else {
-            if let Some(Document { elements }) = Document::from_str(&string).ok() {
-                self.shapes = elements.into_iter().map(Shape2D::from).collect();
-                self.shapes.iter_mut().for_each(|s| {
-                    s.generate();
-                });
-                true
-            } else {
-                false
-            }
+            false
         }
     }
 
@@ -313,31 +372,6 @@ impl Project {
         self.shapes
             .drain_filter(|e| e.is_at(position, width))
             .for_each(|e| e.erase());
-        // if let Some(document) = &mut self.document {
-        //     document
-        //         .elements
-        //         .drain_filter(|e| {
-        //             if let Element::Line(Line { points, .. }, _) = e {
-        //                 points.iter().any(|p| {
-        //                     position.distance_to(Vector2 {
-        //                         x: p.0,
-        //                         y: p.1,
-        //                         _unit: position._unit,
-        //                     }) < p.2 + width
-        //                 })
-        //             } else {
-        //                 false
-        //             }
-        //         })
-        //         .map(|v| match v {
-        //             Element::Line(_, i) => i,
-        //             Element::Ngon(_, i) => i,
-        //             Element::Ellipse(_, i) => i,
-        //         })
-        //         .collect()
-        // } else {
-        //     vec![]
-        // }
     }
 }
 
@@ -352,7 +386,7 @@ pub fn init_panic_hook() {
     // To enable backtrace, you will need the `backtrace` crate to be included in your cargo.toml, or
     // a version of rust where backtrace is included in the standard library (e.g. Rust nightly as of the date of publishing)
     // use backtrace::Backtrace;
-    // use std::backtrace::Backtrace;
+    use std::backtrace::Backtrace;
     let old_hook = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |panic_info| {
         let loc_string;
@@ -372,7 +406,7 @@ pub fn init_panic_hook() {
         }
         godot_error!("{}", error_message);
         // Uncomment the following line if backtrace crate is included as a dependency
-        // godot_error!("Backtrace:\n{:?}", Backtrace::new());
+        godot_error!("Backtrace:\n{:?}", Backtrace::capture());
         (*(old_hook.as_ref()))(panic_info);
 
         unsafe {

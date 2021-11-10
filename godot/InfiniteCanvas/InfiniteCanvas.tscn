@@ -73,6 +73,7 @@ render_target_update_mode = 3
 
 [node name="GCC2D" parent="Viewport" instance=ExtResource( 16 )]
 anchor_mode = 0
+rotation_gesture = 0
 movement_gesture = 2
 
 [node name="Camera2D" type="Camera2D" parent="Viewport"]
