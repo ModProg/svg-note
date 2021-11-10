@@ -122,7 +122,8 @@ impl Shape2D {
         }
     }
 
-    fn draw_to(&mut self, position: Vector2, width: f32) {
+    fn draw_to(&mut self, position: Vector2, width: f32) -> bool {
+        let mut blink = false;
         match self {
             Shape2D::Line(line, _) => {
                 let new = LinePoint(position.x, position.y, width);
@@ -165,10 +166,12 @@ impl Shape2D {
                     }
                 } else {
                     polyline.points.push(new);
+                    blink = true;
                 }
             }
         }
-        self.generate()
+        self.generate();
+        blink
     }
 
     fn svg_elem(&self) -> Element {

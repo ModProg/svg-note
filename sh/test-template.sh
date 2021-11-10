@@ -3,6 +3,8 @@ GODOT_VER=3.2
 template_directory=$PWD
 git branch
 tree -a "${template_directory}"
+rustup install nightly
+rustup default nightly
 rustup component add clippy rustfmt
 cargo install cargo-generate --features vendored-openssl
 if [ ! -f /tmp/godot.zip ]; then
